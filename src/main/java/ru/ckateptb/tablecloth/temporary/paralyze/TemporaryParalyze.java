@@ -95,8 +95,7 @@ public class TemporaryParalyze extends AbstractTemporary {
                 this.armorStand.setMarker(false);
                 this.armorStand.setVisible(false);
                 player.setSneaking(false);
-                changeGameModePacket(player, 3);
-                setSpectatorEntity(player, armorStand);
+                spectateArmorStand();
             }
             temporaryBossBar = new TemporaryBossBar(paralyzeName, duration, player);
         } else {
@@ -108,6 +107,13 @@ public class TemporaryParalyze extends AbstractTemporary {
     @Override
     public TemporaryUpdateState update() {
         return TemporaryUpdateState.CONTINUE;
+    }
+
+    public void spectateArmorStand() {
+        if (livingEntity instanceof Player player) {
+            changeGameModePacket(player, 3);
+            setSpectatorEntity(player, armorStand);
+        }
     }
 
     private void changeGameModePacket(Player player, float value) {

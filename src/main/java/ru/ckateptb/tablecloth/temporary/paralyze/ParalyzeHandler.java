@@ -7,10 +7,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
-import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
+import org.bukkit.event.player.*;
 import org.springframework.stereotype.Component;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
 import ru.ckateptb.tablecloth.temporary.Temporary;
@@ -133,10 +130,48 @@ public class ParalyzeHandler implements Listener {
             }
         }
     }
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void on(EntityDeathEvent event) {
         LivingEntity entity = event.getEntity();
-        if(entity.hasMetadata("tablecloth:paralyze")) {
+        if (entity.hasMetadata("tablecloth:paralyze")) {
+            entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
+                if (metadataValue.value() instanceof Temporary temporary) {
+                    temporaryService.revert(temporary);
+                }
+            });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent  event) {
+        Player entity = event.getPlayer();
+        if (entity.hasMetadata("tablecloth:paralyze")) {
+            entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
+                if (metadataValue.value() instanceof TemporaryParalyze paralyze) {
+                    event.setCancelled(true);
+                    paralyze.spectateArmorStand();
+                }
+            });
+        }
+    }
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerMoveEvent(PlayerMoveEvent event) {
+        Player entity = event.getPlayer();
+        if (entity.hasMetadata("tablecloth:paralyze")) {
+            entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
+                if (metadataValue.value() instanceof TemporaryParalyze paralyze) {
+                    event.setCancelled(true);
+                    paralyze.spectateArmorStand();
+                }
+            });
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void on(PlayerQuitEvent event) {
+        Player entity = event.getPlayer();
+        if (entity.hasMetadata("tablecloth:paralyze")) {
             entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
                 if (metadataValue.value() instanceof Temporary temporary) {
                     temporaryService.revert(temporary);
