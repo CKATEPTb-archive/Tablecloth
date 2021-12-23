@@ -18,7 +18,10 @@ public final class Tablecloth extends AbstractSpringContextHolder {
     @SneakyThrows
     public Tablecloth() {
         Tablecloth.instance = this;
-        SpringContext.register(this, "ru.ckateptb.tablecloth", s -> !s.contains("ru.ckateptb.tablecloth.gui.anvil"));
+        SpringContext.register(this, "ru.ckateptb.tablecloth"
+                , s -> !s.contains("ru.ckateptb.tablecloth.gui.anvil")
+                , s -> !s.contains("ru.ckateptb.tablecloth.storage")
+        );
     }
 
     @Override
