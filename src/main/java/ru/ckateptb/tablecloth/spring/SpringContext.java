@@ -52,10 +52,12 @@ public class SpringContext {
         log.info("Spring scans all components located in {} and beyond", finalBasePackage);
         Set<Class<?>> classes = ClassPath.from(classLoader).getTopLevelClassesRecursive(finalBasePackage).stream()
                 .filter(classInfo -> {
+                    boolean result = true;
                     for(Predicate<String> filter : filters) {
-                        return filter.test(classInfo.getName());
+                        result = filter.test(classInfo.getName());
+                        if(!result) break;
                     }
-                    return true;
+                    return result;
                 })
                 .map(classInfo -> {
                     try {
