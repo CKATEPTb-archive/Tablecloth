@@ -3,12 +3,16 @@ package ru.ckateptb.tablecloth.config;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.core.util.FileUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import javax.annotation.PostConstruct;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,6 +24,7 @@ public abstract class YamlConfig {
         this.load();
         this.save();
     }
+
     /**
      * @return Название файла конфигурации с расширением yml
      */
@@ -40,21 +45,41 @@ public abstract class YamlConfig {
     @SneakyThrows
     public void save() {
         Class<? extends YamlConfig> configurationClass = getClass();
-        Field[] fields = configurationClass.getDeclaredFields();
         YamlConfiguration config = new YamlConfiguration();
-        for (Field field : fields) {
-            if (!field.isAnnotationPresent(ConfigField.class)) continue;
-            field.setAccessible(true);
-            ConfigField configField = field.getAnnotation(ConfigField.class);
-            String configFieldName = configField.name().trim();
-            String fieldName = configFieldName.isEmpty() ? field.getName() : configFieldName;
-            String configFieldComment = configField.comment().trim();
-            if (!configFieldComment.isEmpty()) {
-                config.set(fieldName + "_COMMENT", configFieldComment);
+
+        YamlConfigSaveEvent event = new YamlConfigSaveEvent(getPlugin(), this);
+        event.scan(configurationClass, this);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+        event.getToSetMap().forEach(config::set);
+
+        event.getToScanMap().forEach((clazz, pair) -> {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (!field.isAnnotationPresent(ConfigField.class)) continue;
+                field.setAccessible(true);
+                ConfigField configField = field.getAnnotation(ConfigField.class);
+                String configFieldName = configField.name().trim();
+                String fieldName = pair.getRight().apply(configFieldName.isEmpty() ? field.getName() : configFieldName);
+                String configFieldComment = configField.comment().trim();
+                if (!configFieldComment.isEmpty()) {
+                    config.set(fieldName + "_COMMENT", configFieldComment);
+                }
+                try {
+                    Object instance = pair.getLeft();
+                    if (instance == null && !Modifier.isStatic(field.getModifiers())) {
+                        log.warn("Class {} has variable with configurable annotation ConfigField {}, but the developer forgot to add a static modifier for it, please let him know. This variable will not be updated.", clazz, fieldName);
+                    } else {
+                        config.set(fieldName, field.get(instance));
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
-            config.set(fieldName, field.get(this));
-        }
+        });
+
         String stringConfig = config.saveToString();
+
+
         String header = this.getHeader();
         if (!header.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -102,24 +127,52 @@ public abstract class YamlConfig {
                 stringConfig = stringConfig.substring(1);
             }
             stringConfig = stringConfig.replaceAll("\n+", "\n");
-        } catch (IOException ignored) { }
+        } catch (IOException ignored) {
+        }
         YamlConfiguration config = new YamlConfiguration();
         config.loadFromString(stringConfig);
 
         Class<? extends YamlConfig> configurationClass = getClass();
-        Field[] fields = configurationClass.getDeclaredFields();
-        for (Field field : fields) {
-            if (!field.isAnnotationPresent(ConfigField.class)) continue;
-            field.setAccessible(true);
-            ConfigField configField = field.getAnnotation(ConfigField.class);
-            String configFieldName = configField.name().trim();
-            String fieldName = configFieldName.isEmpty() ? field.getName() : configFieldName;
-            field.set(this, config.get(fieldName, field.get(this)));
-        }
+
+        YamlConfigLoadEvent event = new YamlConfigLoadEvent(getPlugin(), this, config);
+        event.scan(configurationClass, this);
+        Bukkit.getServer().getPluginManager().callEvent(event);
+
+        event.getToScanMap().forEach((clazz, pair) -> {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (!field.isAnnotationPresent(ConfigField.class)) continue;
+                field.setAccessible(true);
+                ConfigField configField = field.getAnnotation(ConfigField.class);
+                String configFieldName = configField.name().trim();
+                String fieldName = pair.getRight().apply(configFieldName.isEmpty() ? field.getName() : configFieldName);
+                try {
+                    String type = field.getType().getSimpleName();
+                    String getMethodName = "get" + type.substring(0, 1).toUpperCase() + type.substring(1);
+                    Method getMethod = MemorySection.class.getDeclaredMethod("get", String.class, Object.class);
+                    for (Method method : MemorySection.class.getDeclaredMethods()) {
+                        if (method.getName().equals(getMethodName) && method.getParameterCount() == 2) {
+                            getMethod = method;
+                            break;
+                        }
+                    }
+                    Object instance = pair.getLeft();
+                    if (instance == null && !Modifier.isStatic(field.getModifiers())) {
+                        log.warn("Class {} has variable with configurable annotation ConfigField {}, but the developer forgot to add a static modifier for it, please let him know. This variable will not be updated.", clazz, fieldName);
+                    } else {
+                        Object value = getMethod.invoke(config, fieldName, field.get(instance));
+                        field.set(instance, value);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     /**
      * @return Плагин, в папке которого будет находится файл с конфигурацией
      */
     abstract public Plugin getPlugin();
+
 }

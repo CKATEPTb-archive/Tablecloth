@@ -9,9 +9,9 @@ import ru.ckateptb.tablecloth.temporary.paralyze.ParalyzeType;
 @Getter
 @Component
 public class TableclothConfig extends YamlConfig {
-    @ConfigField(name = "language.paralyze.name")
+    @ConfigField(name = "paralyze.name")
     private String paralyzeName = "§b§l<==§2§l Paralyzed §b§l==>";
-    @ConfigField(name = "language.paralyze.type", comment = "Allowed types INVENTORY (Not perfect, but very light), ARMORSTAND (recommended ), MOVE_HANDLER (May cause TPS drawdowns with a large number of instances)")
+    @ConfigField(name = "paralyze.type", comment = "Allowed types INVENTORY (Not perfect, but very light), ARMORSTAND (recommended ), MOVE_HANDLER (May cause TPS drawdowns with a large number of instances)")
     private String paralyzeType = ParalyzeType.ARMORSTAND.name();
 
     public ParalyzeType getParalyzeType() {
