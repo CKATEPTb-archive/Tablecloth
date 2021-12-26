@@ -38,6 +38,7 @@ public final class Tablecloth extends AbstractSpringContextHolder {
 
     /**
      * Зарегистрировать событие, которое будет выполнено, после загрузки всех компонентов
+     *
      * @param handler событие, которое будет выполнено после загрузки всех компонентов
      */
     public void registerSpringStartUpHandler(SpringStartUpHandler handler) {

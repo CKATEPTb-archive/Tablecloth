@@ -1,7 +1,6 @@
 package ru.ckateptb.tablecloth.config;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.event.Event;
@@ -31,6 +30,10 @@ public class YamlConfigLoadEvent extends Event {
         this.bukkitConfig = bukkitConfig;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public void scan(Class<?> clazz, Object instance) {
         scan(clazz, instance, (path) -> path);
     }
@@ -41,10 +44,6 @@ public class YamlConfigLoadEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 

@@ -28,6 +28,10 @@ public class YamlConfigSaveEvent extends Event {
         this.yamlConfig = yamlConfig;
     }
 
+    public static HandlerList getHandlerList() {
+        return HANDLERS;
+    }
+
     public void set(String path, Object value) {
         toSetMap.put(path, value);
     }
@@ -42,10 +46,6 @@ public class YamlConfigSaveEvent extends Event {
 
     @Override
     public HandlerList getHandlers() {
-        return HANDLERS;
-    }
-
-    public static HandlerList getHandlerList() {
         return HANDLERS;
     }
 }

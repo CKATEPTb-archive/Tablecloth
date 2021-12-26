@@ -25,6 +25,7 @@ import java.util.List;
 
 public class TemporaryParalyze extends AbstractTemporary {
     public static final ProtocolManager protocolManager;
+
     static {
         protocolManager = ProtocolLibrary.getProtocolManager();
         protocolManager.addPacketListener(
@@ -44,12 +45,11 @@ public class TemporaryParalyze extends AbstractTemporary {
     private final Tablecloth plugin;
     @Getter
     private final LivingEntity livingEntity;
-    private TemporaryBossBar temporaryBossBar;
     private final long duration;
+    public ArmorStand armorStand;
+    private TemporaryBossBar temporaryBossBar;
     private boolean hasAI;
     private AnvilGUI anvilGUI;
-
-    public ArmorStand armorStand;
     private GameMode originalGameMode;
 
     public TemporaryParalyze(LivingEntity livingEntity, long duration) {

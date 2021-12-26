@@ -1,5 +1,7 @@
 package ru.ckateptb.tablecloth.temporary.paralyze;
 
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -144,7 +146,7 @@ public class ParalyzeHandler implements Listener {
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-    public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent  event) {
+    public void onPlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
         Player entity = event.getPlayer();
         if (entity.hasMetadata("tablecloth:paralyze")) {
             entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
@@ -155,9 +157,17 @@ public class ParalyzeHandler implements Listener {
             });
         }
     }
+
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerMoveEvent(PlayerMoveEvent event) {
         Player entity = event.getPlayer();
+        Location fromLocation = event.getFrom();
+        Location toLocation = event.getTo();
+        if (toLocation == null) return;
+        World fromWorld = fromLocation.getWorld();
+        World toWorld = toLocation.getWorld();
+        if (fromWorld != null && toWorld != null && !fromWorld.equals(toWorld)) return;
+        if (fromLocation.getBlock().getLocation().equals(toLocation.getBlock().getLocation())) return;
         if (entity.hasMetadata("tablecloth:paralyze")) {
             entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
                 if (metadataValue.value() instanceof TemporaryParalyze paralyze) {

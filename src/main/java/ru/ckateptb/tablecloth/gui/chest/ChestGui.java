@@ -3,28 +3,27 @@ package ru.ckateptb.tablecloth.gui.chest;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
 import ru.ckateptb.tablecloth.gui.ItemButton;
 import ru.ckateptb.tablecloth.spring.SpringContext;
 
 import java.util.Optional;
+
 @Getter
 public class ChestGui implements InventoryHolder {
     private final Player player;
     private final ItemButton[] buttons;
     private final Inventory inventory;
     private final int slots;
-    @Setter
-    private boolean ignoreCloseEvent;
     @Getter
     public InventoryCloseHandler inventoryCloseHandler = (event) -> {
     };
+    @Setter
+    private boolean ignoreCloseEvent;
 
     public ChestGui(Player player, String title, int rows) {
         Validate.notBlank(title, "Title can't be null");
@@ -49,7 +48,7 @@ public class ChestGui implements InventoryHolder {
     }
 
     public ChestGui fill(ItemButton button) {
-        for(int slot = 0; slot < slots; slot ++) {
+        for (int slot = 0; slot < slots; slot++) {
             this.buttons[slot] = button;
             this.inventory.setItem(slot, button.get());
         }

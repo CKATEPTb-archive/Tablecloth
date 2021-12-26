@@ -40,7 +40,7 @@ public class TemporaryBossBar extends AbstractTemporary {
 
     @Override
     public TemporaryUpdateState update() {
-        if(players.length < 1) return TemporaryUpdateState.REVERT;
+        if (players.length < 1) return TemporaryUpdateState.REVERT;
         if (duration > 0) {
             double spendMs = System.currentTimeMillis() - this.startTime;
             double subtract = spendMs / this.duration;

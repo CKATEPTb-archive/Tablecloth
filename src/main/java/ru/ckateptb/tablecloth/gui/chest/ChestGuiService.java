@@ -30,7 +30,7 @@ public class ChestGuiService implements Listener {
     @EventHandler
     public void on(InventoryCloseEvent event) {
         Optional.ofNullable(instances.remove(event.getInventory())).ifPresent(chestGui -> {
-            if(!chestGui.isIgnoreCloseEvent()) chestGui.getInventoryCloseHandler().handle(event);
+            if (!chestGui.isIgnoreCloseEvent()) chestGui.getInventoryCloseHandler().handle(event);
         });
     }
 

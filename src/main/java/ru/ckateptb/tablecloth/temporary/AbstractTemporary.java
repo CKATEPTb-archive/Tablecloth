@@ -18,23 +18,23 @@ public abstract class AbstractTemporary implements Temporary {
     }
 
     @Override
-    public void setRevertTime(long revertTime) {
-        this.revertTime = revertTime;
-    }
-
-    @Override
     public long getRevertTime() {
         return this.revertTime;
     }
 
     @Override
-    public void setFinalHandler(FinalHandler finalHandler) {
-        this.finalHandler = finalHandler;
+    public void setRevertTime(long revertTime) {
+        this.revertTime = revertTime;
     }
 
     @Override
     public FinalHandler getFinalHandler() {
         return this.finalHandler;
+    }
+
+    @Override
+    public void setFinalHandler(FinalHandler finalHandler) {
+        this.finalHandler = finalHandler;
     }
 
 }

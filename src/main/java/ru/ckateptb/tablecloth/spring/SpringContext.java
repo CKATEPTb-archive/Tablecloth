@@ -22,9 +22,8 @@ import java.util.stream.Collectors;
 @Log4j2
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpringContext {
-    private static AnnotationConfigApplicationContext context;
-
     private static final ArrayListMultimap<SpringContextHolder, Class<?>> classesMultimap = ArrayListMultimap.create();
+    private static AnnotationConfigApplicationContext context;
 
     /**
      * Регистрирует плагин, сканируя все компоненты для их добавления в ioc
@@ -53,9 +52,9 @@ public class SpringContext {
         Set<Class<?>> classes = ClassPath.from(classLoader).getTopLevelClassesRecursive(finalBasePackage).stream()
                 .filter(classInfo -> {
                     boolean result = true;
-                    for(Predicate<String> filter : filters) {
+                    for (Predicate<String> filter : filters) {
                         result = filter.test(classInfo.getName());
-                        if(!result) break;
+                        if (!result) break;
                     }
                     return result;
                 })

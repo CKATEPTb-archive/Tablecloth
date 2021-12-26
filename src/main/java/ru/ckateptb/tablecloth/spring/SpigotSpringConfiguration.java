@@ -13,7 +13,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import ru.ckateptb.tablecloth.Tablecloth;
-import ru.ckateptb.tablecloth.command.SimpleCommand;
 import ru.ckateptb.tablecloth.spring.schedule.ScheduleService;
 
 import java.util.stream.Collectors;

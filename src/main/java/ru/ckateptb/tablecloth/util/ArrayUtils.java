@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 public class ArrayUtils {
     /**
      * Соединить два массива в один
+     *
      * @param A первый массив
      * @param B второй массив
      * @return результат из двух массивов

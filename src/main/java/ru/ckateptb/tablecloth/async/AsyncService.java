@@ -23,8 +23,9 @@ public class AsyncService {
     /**
      * Выполнить действие supplier асинхронно, после выполнения supplier выполнить handler,
      * который содержит результат supplier
+     *
      * @param supplier действие, которое нужно выполнить асинхронно
-     * @param handler действие, которое выполняется по завершению handler
+     * @param handler  действие, которое выполняется по завершению handler
      * @return CompletableFuture#supplyAsync(supplier)
      */
     public CompletableFuture<Object> supplyAsync(Supplier<Object> supplier, Consumer<Object> handler) {

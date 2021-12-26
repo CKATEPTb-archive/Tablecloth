@@ -3,27 +3,28 @@ package ru.ckateptb.tablecloth.temporary;
 public interface Temporary {
 
     /**
-     * Установить время, когда объект должен вернутся в исходное состояние
-     * Установите -1 если время не ограничено
-     * @param revertTime время в TimeMillis
-     */
-    void setRevertTime(long revertTime);
-
-    /**
      * @return время в TimeMillis, когда объект должен вернутся в исходное состояние
      * -1 означает, что время не ограничено
      */
     long getRevertTime();
 
     /**
-     * @param finalHandler - обработчик, который будет выполнен перед методом {@link #revert()}
+     * Установить время, когда объект должен вернутся в исходное состояние
+     * Установите -1 если время не ограничено
+     *
+     * @param revertTime время в TimeMillis
      */
-    void setFinalHandler(FinalHandler finalHandler);
+    void setRevertTime(long revertTime);
 
     /**
      * @return обработчик, который будет выполнен перед методом {@link #revert()}
      */
     FinalHandler getFinalHandler();
+
+    /**
+     * @param finalHandler - обработчик, который будет выполнен перед методом {@link #revert()}
+     */
+    void setFinalHandler(FinalHandler finalHandler);
 
     /**
      * Зарегистрировать объект в сервисе, для дальнейшей работы с ним
@@ -37,6 +38,7 @@ public interface Temporary {
 
     /**
      * Данный метод вызывается каждый игровой тик
+     *
      * @return нужно ли возвращать объект в исходное состояние или необходимо продолжить обработку
      */
     TemporaryUpdateState update();
