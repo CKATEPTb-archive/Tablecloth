@@ -1,30 +1,30 @@
 package ru.ckateptb.tablecloth.collision;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
-import ru.ckateptb.tablecloth.util.AdaptUtils;
+import org.bukkit.util.Vector;
 import ru.ckateptb.tablecloth.util.VectorUtils;
 
 import java.util.*;
 
+
 public final class RayCaster {
-    private static final List<Vector3D> DIRECTIONS = Arrays.asList(
-            Vector3D.ZERO,
-            Vector3D.PLUS_I, Vector3D.PLUS_J, Vector3D.PLUS_K,
-            Vector3D.MINUS_I, Vector3D.MINUS_J, Vector3D.MINUS_K,
+    private static final List<Vector> DIRECTIONS = Arrays.asList(
+            VectorUtils.ZERO,
+            VectorUtils.PLUS_I, VectorUtils.PLUS_J, VectorUtils.PLUS_K,
+            VectorUtils.MINUS_I, VectorUtils.MINUS_J, VectorUtils.MINUS_K,
 
-            new Vector3D(0, 1, 1), new Vector3D(0, 1, -1),
-            new Vector3D(1, 1, 0), new Vector3D(1, 1, 1), new Vector3D(1, 1, -1),
-            new Vector3D(-1, 1, 0), new Vector3D(-1, 1, 1), new Vector3D(-1, 1, -1),
+            new Vector(0, 1, 1), new Vector(0, 1, -1),
+            new Vector(1, 1, 0), new Vector(1, 1, 1), new Vector(1, 1, -1),
+            new Vector(-1, 1, 0), new Vector(-1, 1, 1), new Vector(-1, 1, -1),
 
-            new Vector3D(0, -1, 1), new Vector3D(0, -1, -1),
-            new Vector3D(1, -1, 0), new Vector3D(1, -1, 1), new Vector3D(1, -1, -1),
-            new Vector3D(-1, -1, 0), new Vector3D(-1, -1, 1), new Vector3D(-1, -1, -1)
+            new Vector(0, -1, 1), new Vector(0, -1, -1),
+            new Vector(1, -1, 0), new Vector(1, -1, 1), new Vector(1, -1, -1),
+            new Vector(-1, -1, 0), new Vector(-1, -1, 1), new Vector(-1, -1, -1)
     );
 
     private RayCaster() {
@@ -144,8 +144,8 @@ public final class RayCaster {
             Location current = origin.add(
                     ray.direction
                             .multiply(i));
-            for (Vector3D direction : DIRECTIONS) {
-                Location check = current.add(AdaptUtils.adapt(direction));
+            for (Vector direction : DIRECTIONS) {
+                Location check = current.add(direction);
                 Block block = check.getBlock();
 
                 if (transparent.contains(block.getType())) {
@@ -188,8 +188,8 @@ public final class RayCaster {
             Location current = origin.add(
                     ray.direction
                             .multiply(i));
-            for (Vector3D direction : DIRECTIONS) {
-                Location check = current.add(AdaptUtils.adapt(direction));
+            for (Vector direction : DIRECTIONS) {
+                Location check = current.add(direction);
                 Block block = check.getBlock();
 
                 if (ignoreBlocks.contains(block)) {
@@ -243,8 +243,8 @@ public final class RayCaster {
         // Progress through each block and check all neighbors for ray intersection.
         for (double i = 0; i < maxRange + 1; ++i) {
             Location current = origin.add(ray.direction.multiply(i));
-            for (Vector3D direction : DIRECTIONS) {
-                Location check = current.add(AdaptUtils.adapt(direction));
+            for (Vector direction : DIRECTIONS) {
+                Location check = current.add(direction);
                 Block block = check.getBlock();
                 AABB localBounds = BukkitAABB.getBlockBounds(block);
 
@@ -283,8 +283,8 @@ public final class RayCaster {
         for (double i = 0; i < maxRange + 1; ++i) {
             Location current = origin.add(ray.direction.multiply(i));
 
-            for (Vector3D direction : DIRECTIONS) {
-                Location check = current.add(AdaptUtils.adapt(direction));
+            for (Vector direction : DIRECTIONS) {
+                Location check = current.add(direction);
                 Block block = check.getBlock();
                 AABB localBounds = BukkitAABB.getBlockBounds(block);
 
@@ -327,8 +327,8 @@ public final class RayCaster {
 
         for (double i = 0; i < range + 1; ++i) {
             Location current = origin.add(ray.direction.multiply(i));
-            for (Vector3D direction : DIRECTIONS) {
-                Block block = current.add(AdaptUtils.adapt(direction)).getBlock();
+            for (Vector direction : DIRECTIONS) {
+                Block block = current.add(direction).getBlock();
                 AABB blockBounds = AABB.BLOCK_BOUNDS.at(block.getLocation());
 
                 Optional<Double> result = blockBounds.intersects(ray);

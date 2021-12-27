@@ -2,6 +2,8 @@ package ru.ckateptb.tablecloth.collision;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import ru.ckateptb.tablecloth.util.VectorUtils;
 
@@ -14,6 +16,14 @@ public class AABB implements Collider {
     private final Vector min;
     private final Vector max;
     private final World world;
+
+    public static AABB from(Block block) {
+        return BukkitAABB.getBlockBounds(block);
+    }
+
+    public static AABB from(Entity entity) {
+        return BukkitAABB.getEntityBounds(entity);
+    }
 
     public AABB(Vector min, Vector max) {
         this(min, max, null);
