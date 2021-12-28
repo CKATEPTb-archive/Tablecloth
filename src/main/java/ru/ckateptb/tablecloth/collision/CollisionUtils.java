@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class CollisionUtil {
+public final class CollisionUtils {
     // Checks a collider to see if it's hitting any entities near it.
     // Calls the CollisionCallback when hitting a target.
     // Returns true if it hits a target.
