@@ -1,7 +1,10 @@
 package ru.ckateptb.tablecloth.util;
 
-import java.lang.reflect.Array;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+import java.lang.reflect.Array;
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArrayUtils {
     /**
      * Соединить два массива в один

@@ -15,6 +15,8 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -190,7 +192,13 @@ public class ArmorHandler implements Listener {
             if (armorEquipEvent.isCancelled()) {
                 ItemStack i = e.getBrokenItem().clone();
                 i.setAmount(1);
-                i.setDurability((short) (i.getDurability() - 1));
+                ItemMeta itemMeta = i.getItemMeta();
+                if(itemMeta == null) {
+                    itemMeta = Bukkit.getItemFactory().getItemMeta(i.getType());
+                }
+                if(itemMeta instanceof Damageable damageable) {
+                    damageable.setDamage(damageable.getDamage() - 1);
+                }
                 if (type.equals(ArmorType.HELMET)) {
                     p.getInventory().setHelmet(i);
                 } else if (type.equals(ArmorType.CHESTPLATE)) {

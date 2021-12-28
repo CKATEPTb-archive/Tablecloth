@@ -1,18 +1,19 @@
 package ru.ckateptb.tablecloth.util;
 
 import com.comphenix.protocol.utility.StreamSerializer;
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdaptUtils {
     private static final char[] VALUES = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -76,14 +77,6 @@ public class AdaptUtils {
             }
         }
         return null;
-    }
-
-    public static Vector adapt(Vector3D vector3D) {
-        return new Vector(vector3D.getX(), vector3D.getY(), vector3D.getZ());
-    }
-
-    public static Vector3D adapt(Vector vector) {
-        return new Vector3D(vector.getX(), vector.getY(), vector.getZ());
     }
 
     public static String adapt(ItemStack itemStack) {

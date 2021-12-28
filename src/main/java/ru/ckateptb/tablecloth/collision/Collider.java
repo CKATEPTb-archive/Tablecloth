@@ -1,16 +1,15 @@
 package ru.ckateptb.tablecloth.collision;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.bukkit.World;
+import ru.ckateptb.tablecloth.math.Vector3d;
 
 public interface Collider {
     boolean intersects(Collider collider);
 
-    Vector3D getPosition();
+    Vector3d getPosition();
 
-    Vector3D getHalfExtents();
+    Collider at(Vector3d point);
 
-    World getWorld();
+    Vector3d getHalfExtents();
 
-    boolean contains(Vector3D point);
+    boolean contains(Vector3d point);
 }
