@@ -21,6 +21,7 @@ public class TemporaryBlock extends AbstractTemporary {
     private final long duration;
     private final long startTime;
     private BlockState original;
+
     public TemporaryBlock(Location location, BlockData blockData, long duration) {
         this.location = location;
         this.blockData = blockData;

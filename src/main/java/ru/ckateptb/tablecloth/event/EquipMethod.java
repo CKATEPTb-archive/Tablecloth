@@ -33,6 +33,5 @@ public enum EquipMethod {
      * When you die causing all armor to unequip
      */
     DEATH,
-    ;
 }
 

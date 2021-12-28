@@ -1,8 +1,9 @@
-package ru.ckateptb.tablecloth.collision;
+package ru.ckateptb.tablecloth.collision.geometry;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
+import ru.ckateptb.tablecloth.collision.Collider;
 
 // Combines an OBB and Sphere to create a disc-like collider.
 public class Disc implements Collider {
@@ -14,7 +15,7 @@ public class Disc implements Collider {
         this.sphere = sphere;
     }
 
-    public Disc addPosition(Vector position) {
+    public Disc addPosition(Vector3D position) {
         return new Disc(this.obb.addPosition(position), this.sphere.at(position));
     }
 
@@ -22,7 +23,7 @@ public class Disc implements Collider {
         return new Disc(this.obb.addPosition(position), this.sphere.at(position));
     }
 
-    public Disc at(Vector position) {
+    public Disc at(Vector3D position) {
         return new Disc(this.obb.at(position), this.sphere.at(position));
     }
 
@@ -36,12 +37,12 @@ public class Disc implements Collider {
     }
 
     @Override
-    public Vector getPosition() {
+    public Vector3D getPosition() {
         return sphere.center;
     }
 
     @Override
-    public Vector getHalfExtents() {
+    public Vector3D getHalfExtents() {
         return obb.getHalfExtents();
     }
 
@@ -51,7 +52,7 @@ public class Disc implements Collider {
     }
 
     @Override
-    public boolean contains(Vector point) {
+    public boolean contains(Vector3D point) {
         return sphere.contains(point) && obb.contains(point);
     }
 
@@ -63,4 +64,3 @@ public class Disc implements Collider {
         return sphere;
     }
 }
-

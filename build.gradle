@@ -69,7 +69,6 @@ dependencies {
     implementation 'de.themoep:minedown:1.7.1-SNAPSHOT'
     implementation 'org.apache.commons:commons-math3:3.5'
 
-
     implementation 'com.zaxxer:HikariCP:3.4.2'
     implementation 'com.j256.ormlite:ormlite-jdbc:6.0'
 

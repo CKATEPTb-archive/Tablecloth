@@ -1,41 +1,42 @@
-package ru.ckateptb.tablecloth.collision;
+package ru.ckateptb.tablecloth.collision.geometry;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.util.Vector;
-import ru.ckateptb.tablecloth.util.VectorUtils;
-
+import ru.ckateptb.tablecloth.collision.Collider;
+import ru.ckateptb.tablecloth.collision.vector.VectorUtils;
+import ru.ckateptb.tablecloth.util.AdaptUtils;
 
 // Oriented bounding box
 public class OBB implements Collider {
-    private final Vector center;
+    private final Vector3D center;
     private final RealMatrix basis;
     // Half extents in local space.
-    private final Vector e;
+    private final Vector3D e;
     private final World world;
 
-    public OBB(Vector center, Vector halfExtents, Vector axis0, Vector axis1, Vector axis2) {
+    public OBB(Vector3D center, Vector3D halfExtents, Vector3D axis0, Vector3D axis1, Vector3D axis2) {
         this(center, halfExtents, axis0, axis1, axis2, null);
     }
 
-    public OBB(Vector center, Vector halfExtents, Vector axis0, Vector axis1, Vector axis2, World world) {
+    public OBB(Vector3D center, Vector3D halfExtents, Vector3D axis0, Vector3D axis1, Vector3D axis2, World world) {
         this.center = center;
         this.e = halfExtents;
         this.basis = MatrixUtils.createRealMatrix(3, 3);
-        this.basis.setRow(0, VectorUtils.toArray(axis0));
-        this.basis.setRow(1, VectorUtils.toArray(axis1));
-        this.basis.setRow(2, VectorUtils.toArray(axis2));
+        this.basis.setRow(0, axis0.toArray());
+        this.basis.setRow(1, axis1.toArray());
+        this.basis.setRow(2, axis2.toArray());
         this.world = world;
     }
 
-    public OBB(Vector center, RealMatrix basis, Vector halfExtents) {
+    public OBB(Vector3D center, RealMatrix basis, Vector3D halfExtents) {
         this(center, basis, halfExtents, null);
     }
 
-    public OBB(Vector center, RealMatrix basis, Vector halfExtents, World world) {
+    public OBB(Vector3D center, RealMatrix basis, Vector3D halfExtents, World world) {
         this.center = center;
         this.basis = basis;
         this.e = halfExtents;
@@ -58,26 +59,26 @@ public class OBB implements Collider {
     }
 
     public OBB(AABB aabb, Rotation rotation, World world) {
-        this.center = VectorUtils.applyRotation(rotation, aabb.getPosition());
+        this.center = rotation.applyTo(aabb.getPosition());
         this.basis = MatrixUtils.createRealMatrix(rotation.getMatrix());
         this.e = aabb.getHalfExtents();
         this.world = world;
     }
 
-    public OBB addPosition(Vector position) {
+    public OBB addPosition(Vector3D position) {
         return new OBB(center.add(position), basis, e, world);
     }
 
     public OBB addPosition(Location location) {
-        return new OBB(center.add(location.toVector()), basis, e, location.getWorld());
+        return new OBB(center.add(AdaptUtils.adapt(location.toVector())), basis, e, location.getWorld());
     }
 
-    public OBB at(Vector position) {
+    public OBB at(Vector3D position) {
         return new OBB(position, basis, e, world);
     }
 
     public OBB at(Location location) {
-        return new OBB(location.toVector(), basis, e, location.getWorld());
+        return new OBB(AdaptUtils.adapt(location.toVector()), basis, e, location.getWorld());
     }
 
     @Override
@@ -109,9 +110,9 @@ public class OBB implements Collider {
 
         RealMatrix R = getRotationMatrix(other);
         // translation
-        Vector t = other.center.subtract(center);
+        Vector3D t = other.center.subtract(center);
         // Bring into coordinate frame
-        t = VectorUtils.fromArray(basis.operate(VectorUtils.toArray(t)));
+        t = new Vector3D(basis.operate(t.toArray()));
         RealMatrix absR = MatrixUtils.createRealMatrix(3, 3);
 
         for (int i = 0; i < 3; ++i) {
@@ -122,10 +123,10 @@ public class OBB implements Collider {
 
         // test this box's axes
         for (int i = 0; i < 3; ++i) {
-            Vector row = VectorUtils.fromArray(absR.getRow(i));
+            Vector3D row = new Vector3D(absR.getRow(i));
 
             ra = VectorUtils.component(e, i);
-            rb = other.e.dot(row);
+            rb = other.e.dotProduct(row);
 
             if (Math.abs(VectorUtils.component(t, i)) > ra + rb) {
                 return false;
@@ -134,13 +135,13 @@ public class OBB implements Collider {
 
         // test other box's axes
         for (int i = 0; i < 3; ++i) {
-            Vector col = VectorUtils.fromArray(absR.getColumn(i));
+            Vector3D col = new Vector3D(absR.getColumn(i));
 
-            ra = e.dot(col);
+            ra = e.dotProduct(col);
             rb = VectorUtils.component(other.e, i);
 
-            Vector rotCol = VectorUtils.fromArray(R.getColumn(i));
-            if (Math.abs(t.dot(rotCol)) > ra + rb) {
+            Vector3D rotCol = new Vector3D(R.getColumn(i));
+            if (Math.abs(t.dotProduct(rotCol)) > ra + rb) {
                 return false;
             }
         }
@@ -213,10 +214,10 @@ public class OBB implements Collider {
 
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 3; ++j) {
-                Vector a = VectorUtils.fromArray(basis.getRow(i));
-                Vector b = VectorUtils.fromArray(other.basis.getRow(j));
+                Vector3D a = new Vector3D(basis.getRow(i));
+                Vector3D b = new Vector3D(other.basis.getRow(j));
 
-                r.setEntry(i, j, a.dot(b));
+                r.setEntry(i, j, a.dotProduct(b));
             }
         }
 
@@ -224,34 +225,34 @@ public class OBB implements Collider {
     }
 
     // Returns the position closest to the target that lies on/in the OBB.
-    public Vector getClosestPosition(Vector target) {
-        Vector t = target.subtract(center);
-        Vector closest = center;
+    public Vector3D getClosestPosition(Vector3D target) {
+        Vector3D t = target.subtract(center);
+        Vector3D closest = center;
 
         // Project target onto basis axes and move toward it.
         for (int i = 0; i < 3; ++i) {
-            Vector axis = VectorUtils.fromArray(basis.getRow(i));
+            Vector3D axis = new Vector3D(basis.getRow(i));
             double r = VectorUtils.component(e, i);
-            double dist = Math.max(-r, Math.min(t.dot(axis), r));
+            double dist = Math.max(-r, Math.min(t.dotProduct(axis), r));
 
-            closest = closest.add(axis.multiply(dist));
+            closest = closest.add(axis.scalarMultiply(dist));
         }
 
         return closest;
     }
 
     @Override
-    public Vector getPosition() {
+    public Vector3D getPosition() {
         return center;
     }
 
     @Override
-    public Vector getHalfExtents() {
-        double x = e.dot(VectorUtils.PLUS_I);
-        double y = e.dot(VectorUtils.PLUS_J);
-        double z = e.dot(VectorUtils.PLUS_K);
+    public Vector3D getHalfExtents() {
+        double x = e.dotProduct(Vector3D.PLUS_I);
+        double y = e.dotProduct(Vector3D.PLUS_J);
+        double z = e.dotProduct(Vector3D.PLUS_K);
 
-        return new Vector(x, y, z);
+        return new Vector3D(x, y, z);
     }
 
     @Override
@@ -260,19 +261,18 @@ public class OBB implements Collider {
     }
 
     @Override
-    public boolean contains(Vector point) {
+    public boolean contains(Vector3D point) {
         double epsilon = 0.001;
-        return getClosestPosition(point).distanceSquared(point) <= epsilon;
+        return getClosestPosition(point).distanceSq(point) <= epsilon;
     }
 
-    public Vector getHalfDiagonal() {
-        Vector result = VectorUtils.ZERO.clone();
+    public Vector3D getHalfDiagonal() {
+        Vector3D result = Vector3D.ZERO;
 
         for (int i = 0; i < 3; ++i) {
-            result = result.add(VectorUtils.fromArray(basis.getRow(i)).multiply(VectorUtils.component(e, i)));
+            result = result.add(new Vector3D(basis.getRow(i)).scalarMultiply(VectorUtils.component(e, i)));
         }
 
         return result;
     }
 }
-

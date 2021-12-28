@@ -1,34 +1,31 @@
-package ru.ckateptb.tablecloth.collision;
+package ru.ckateptb.tablecloth.collision.geometry;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.util.Vector;
-import ru.ckateptb.tablecloth.util.WorldUtils;
-
-import java.util.Collection;
+import ru.ckateptb.tablecloth.collision.Collider;
+import ru.ckateptb.tablecloth.util.AdaptUtils;
 
 public class Sphere implements Collider {
-    public Vector center;
+    public Vector3D center;
     public double radius;
     public World world;
 
-    public Sphere(Vector center, double radius) {
+    public Sphere(Vector3D center, double radius) {
         this(center, radius, null);
     }
 
     public Sphere(Location center, double radius) {
-        this(center.toVector(), radius, center.getWorld());
+        this(AdaptUtils.adapt(center.toVector()), radius, center.getWorld());
     }
 
-    public Sphere(Vector center, double radius, World world) {
+    public Sphere(Vector3D center, double radius, World world) {
         this.center = center;
         this.radius = radius;
         this.world = world;
     }
 
-    public Sphere at(Vector newCenter) {
+    public Sphere at(Vector3D newCenter) {
         return new Sphere(newCenter, radius, world);
     }
 
@@ -41,8 +38,8 @@ public class Sphere implements Collider {
             return false;
         }
 
-        Vector min = aabb.min();
-        Vector max = aabb.max();
+        Vector3D min = aabb.min();
+        Vector3D max = aabb.max();
 
         if (min == null || max == null) return false;
 
@@ -52,7 +49,7 @@ public class Sphere implements Collider {
         double z = Math.max(min.getZ(), Math.min(center.getZ(), max.getZ()));
 
         // Check if that point is inside of the sphere.
-        return contains(new Vector(x, y, z));
+        return contains(new Vector3D(x, y, z));
     }
 
     public boolean intersects(OBB obb) {
@@ -60,10 +57,10 @@ public class Sphere implements Collider {
             return false;
         }
 
-        Vector closest = obb.getClosestPosition(center);
-        Vector v = center.subtract(closest);
+        Vector3D closest = obb.getClosestPosition(center);
+        Vector3D v = center.subtract(closest);
 
-        return v.dot(v) <= radius * radius;
+        return v.dotProduct(v) <= radius * radius;
     }
 
     public boolean intersects(Sphere other) {
@@ -71,7 +68,7 @@ public class Sphere implements Collider {
             return false;
         }
 
-        double distSq = other.center.distanceSquared(center);
+        double distSq = other.center.distanceSq(center);
         double rsum = radius + other.radius;
 
         // Spheres will be colliding if their distance apart is less than the sum of the radii.
@@ -79,11 +76,11 @@ public class Sphere implements Collider {
     }
 
     public boolean intersects(Ray ray) {
-        Vector m = ray.origin.subtract(center);
-        double b = m.dot(ray.direction);
+        Vector3D m = ray.origin.subtract(center);
+        double b = m.dotProduct(ray.direction);
 
         // Use quadratic equation to solve ray-sphere intersection.
-        double discriminant = b * b - (m.dot(m) - radius * radius);
+        double discriminant = b * b - (m.dotProduct(m) - radius * radius);
 
         return discriminant >= 0;
     }
@@ -108,13 +105,13 @@ public class Sphere implements Collider {
     }
 
     @Override
-    public Vector getPosition() {
+    public Vector3D getPosition() {
         return center;
     }
 
     @Override
-    public Vector getHalfExtents() {
-        return new Vector(radius, radius, radius);
+    public Vector3D getHalfExtents() {
+        return new Vector3D(radius, radius, radius);
     }
 
     @Override
@@ -122,12 +119,8 @@ public class Sphere implements Collider {
         return world;
     }
 
-    public boolean contains(Vector point) {
-        double distSq = center.distanceSquared(point);
+    public boolean contains(Vector3D point) {
+        double distSq = center.distanceSq(point);
         return distSq <= radius * radius;
-    }
-
-    public Collection<Block> handleBlockCollisions(Material... ignored) {
-        return WorldUtils.getNearbyBlocks(center.toLocation(world), radius, ignored);
     }
 }

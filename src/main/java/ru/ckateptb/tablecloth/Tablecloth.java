@@ -13,7 +13,7 @@ import java.util.List;
 public final class Tablecloth extends AbstractSpringContextHolder {
     @Getter
     private static Tablecloth instance;
-    private List<SpringStartUpHandler> springStartUpHandlerList = new ArrayList<>();
+    private final List<SpringStartUpHandler> springStartUpHandlerList = new ArrayList<>();
 
     @SneakyThrows
     public Tablecloth() {

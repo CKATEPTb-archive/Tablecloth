@@ -1,5 +1,8 @@
-package ru.ckateptb.tablecloth.util;
+package ru.ckateptb.tablecloth.collision;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.util.Pair;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -9,46 +12,49 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
-import ru.ckateptb.tablecloth.collision.AABB;
-import ru.ckateptb.tablecloth.collision.Collider;
-import ru.ckateptb.tablecloth.collision.Ray;
+import ru.ckateptb.tablecloth.collision.geometry.AABB;
+import ru.ckateptb.tablecloth.collision.geometry.Ray;
+import ru.ckateptb.tablecloth.collision.vector.VectorUtils;
+import ru.ckateptb.tablecloth.util.AdaptUtils;
+import ru.ckateptb.tablecloth.util.WorldUtils;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
-public final class CollisionUtils {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class CollisionUtil {
     // Checks a collider to see if it's hitting any entities near it.
     // Calls the CollisionCallback when hitting a target.
     // Returns true if it hits a target.
-    public static boolean handleEntityCollisions(LivingEntity entity, Collider collider, Collider.CollisionCallback callback, boolean livingOnly) {
-        return handleEntityCollisions(entity, collider, callback, livingOnly, false);
+    public static boolean handleEntityCollisions(LivingEntity user, Collider collider, CollisionCallback callback, boolean livingOnly) {
+        return handleEntityCollisions(user, collider, callback, livingOnly, false);
     }
 
-    public static boolean handleEntityCollisions(LivingEntity entity, Collider collider, Collider.CollisionCallback callback, boolean livingOnly, boolean selfCollision) {
-        return handleEntityCollisions(entity, collider, callback, livingOnly, false, selfCollision);
+    public static boolean handleEntityCollisions(LivingEntity user, Collider collider, CollisionCallback callback, boolean livingOnly, boolean selfCollision) {
+        return handleEntityCollisions(user, collider, callback, livingOnly, selfCollision, false);
     }
 
     // Checks a collider to see if it's hitting any entities near it.
     // Calls the CollisionCallback when hitting a target.
     // Returns true if it hits a target.
-    public static boolean handleEntityCollisions(LivingEntity livingEntity, Collider collider, Collider.CollisionCallback callback, boolean livingOnly, boolean armorStandCollision, boolean selfCollision) {
+    public static boolean handleEntityCollisions(LivingEntity user, Collider collider, CollisionCallback callback, boolean livingOnly, boolean selfCollision, boolean armorStandCollision) {
         // This is used to increase the lookup volume for nearby entities.
         // Entity locations can be out of the collider volume while still intersecting.
         final double ExtentBuffer = 4.0;
 
         // Create the extent vector to use as size of bounding box to find nearby entities.
-        Vector extent = collider.getHalfExtents().add(new Vector(ExtentBuffer, ExtentBuffer, ExtentBuffer));
-        Vector pos = collider.getPosition();
-        Location location = livingEntity.getLocation();
+        Vector3D extent = collider.getHalfExtents().add(new Vector3D(ExtentBuffer, ExtentBuffer, ExtentBuffer));
+        Vector3D pos = collider.getPosition();
+        Location location = user.getLocation();
         location.setX(pos.getX());
         location.setY(pos.getY());
         location.setZ(pos.getZ());
 
         boolean hit = false;
 
-        for (Entity entity : location.getWorld().getNearbyEntities(location, extent.getX(), extent.getY(), extent.getZ())) {
-            if (!selfCollision && entity.equals(livingEntity)) continue;
+        for (Entity entity : Objects.requireNonNull(location.getWorld()).getNearbyEntities(location, extent.getX(), extent.getY(), extent.getZ())) {
+            if (!selfCollision && entity.equals(user)) continue;
 
             if (entity instanceof Player && ((Player) entity).getGameMode() == GameMode.SPECTATOR) {
                 continue;
@@ -81,10 +87,10 @@ public final class CollisionUtils {
         double maxExtent = VectorUtils.getMaxComponent(collider.getHalfExtents());
         double distance = begin.distance(end);
 
-        Vector toEnd = end.subtract(begin).toVector().normalize();
-        Ray ray = new Ray(begin.toVector(), toEnd);
+        Vector3D toEnd = AdaptUtils.adapt(end.clone().subtract(begin).toVector()).normalize();
+        Ray ray = new Ray(AdaptUtils.adapt(begin.toVector()), toEnd);
 
-        Location mid = begin.add(toEnd.multiply(distance / 2.0));
+        Location mid = begin.clone().add(AdaptUtils.adapt(toEnd.scalarMultiply(distance / 2.0)));
         double lookupRadius = (distance / 2.0) + maxExtent + 1.0;
 
         for (Block block : WorldUtils.getNearbyBlocks(mid, lookupRadius, Arrays.asList(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR))) {
@@ -100,7 +106,7 @@ public final class CollisionUtils {
             if (result.isPresent()) {
                 double d = result.get();
                 if (d < distance) {
-                    return new Pair<>(true, begin.add(toEnd.multiply(d)));
+                    return new Pair<>(true, begin.clone().add(AdaptUtils.adapt(toEnd.scalarMultiply(d))));
                 }
             }
         }
@@ -108,17 +114,17 @@ public final class CollisionUtils {
         return new Pair<>(false, null);
     }
 
-    public static Optional<Pair<Double, Double>> sweepAABB(AABB a, Vector aPrevPos, Vector aCurPos, AABB b, Vector bPrevPos, Vector bCurPos) {
+    public static Optional<Pair<Double, Double>> sweepAABB(AABB a, Vector3D aPrevPos, Vector3D aCurPos, AABB b, Vector3D bPrevPos, Vector3D bCurPos) {
         AABB aPrev = a.at(aPrevPos);
         AABB bPrev = b.at(bPrevPos);
 
-        Vector da = aCurPos.subtract(aPrevPos);
-        Vector db = bCurPos.subtract(bPrevPos);
+        Vector3D da = aCurPos.subtract(aPrevPos);
+        Vector3D db = bCurPos.subtract(bPrevPos);
 
-        Vector v = db.subtract(da);
+        Vector3D v = db.subtract(da);
 
-        Vector overlapFirst = new Vector(0, 0, 0);
-        Vector overlapLast = new Vector(0, 0, 0);
+        Vector3D overlapFirst = Vector3D.ZERO;
+        Vector3D overlapLast = Vector3D.ZERO;
 
         if (aPrev.intersects(bPrev)) {
             return Optional.of(new Pair<>(0.0, 0.0));
