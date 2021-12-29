@@ -50,10 +50,11 @@ public class TemporaryService {
      * @param temporary - временный объект, который необходимо вернуть в исходное состояние
      */
     public void revert(Temporary temporary) {
-        temporaryList.remove(temporary);
-        Temporary.FinalHandler finalHandler = temporary.getFinalHandler();
-        if (finalHandler != null) finalHandler.on();
-        temporary.revert();
+        if(temporaryList.remove(temporary)) {
+            Temporary.FinalHandler finalHandler = temporary.getFinalHandler();
+            if (finalHandler != null) finalHandler.on();
+            temporary.revert();
+        }
     }
 
     /**
