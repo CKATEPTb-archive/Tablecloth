@@ -9,7 +9,7 @@ plugins {
 group = "ru.ckateptb"
 version = "1.0.1-SNAPSHOT"
 var githubName = "Tablecloth"
-var githubAuthor = "CKATEPTb"
+var githubOwner = "CKATEPTb"
 
 java {
     toolchain {
@@ -102,7 +102,7 @@ publishing {
             }
             pom {
                 name.set(project.name)
-                url.set("https://github.com/${githubAuthor}/${githubName}")
+                url.set("https://github.com/${githubOwner}/${githubName}")
                 licenses {
                     license {
                         name.set("The GNU Affero General Public License, Version 3.0")
@@ -110,20 +110,20 @@ publishing {
                     }
                 }
                 scm {
-                    connection.set("scm:git:https://github.com/${githubAuthor}/${githubName}.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/${githubAuthor}/${githubName}.git")
-                    url.set("https://github.com/${githubAuthor}/${githubName}")
+                    connection.set("scm:git:https://github.com/${githubOwner}/${githubName}.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/${githubOwner}/${githubName}.git")
+                    url.set("https://github.com/${githubOwner}/${githubName}")
                 }
                 issueManagement {
                     system.set("Github")
-                    url.set("https://github.com/${githubAuthor}/${githubName}/issues")
+                    url.set("https://github.com/${githubOwner}/${githubName}/issues")
                 }
             }
         }
         repositories {
             maven {
                 name = githubName
-                url = uri("https://maven.pkg.github.com/${githubAuthor}/${githubName}")
+                url = uri("https://maven.pkg.github.com/${githubOwner}/${githubName}")
                 credentials {
                     username = System.getenv("GITHUB_ACTOR")
                     password = System.getenv("GITHUB_TOKEN")
