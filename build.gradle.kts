@@ -69,7 +69,7 @@ tasks {
         }
     }
     build {
-        dependsOn(shadowJar)
+        dependsOn(reobfJar, shadowJar)
     }
     withType<Sign>().configureEach {
         onlyIf { !isSnapshot() }
