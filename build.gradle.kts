@@ -1,16 +1,22 @@
 plugins {
     java
+    signing
     `maven-publish`
     id("com.github.johnrengelman.shadow").version("7.1.0")
     id("io.papermc.paperweight.userdev").version("1.3.3")
 }
 
 group = "ru.ckateptb"
-version = "1.0.0-SNAPSHOT"
+version = "1.0.1-SNAPSHOT"
+var githubName = "Tablecloth"
+var githubAuthor = "CKATEPTb"
 
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
+    }
+    if (!isSnapshot()) {
+        withJavadocJar()
     }
     withSourcesJar()
 }
@@ -38,13 +44,13 @@ repositories {
 }
 
 dependencies {
-    shadow("org.springframework:spring-context:5.3.9")
-    shadow("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
-    shadow("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
-    shadow("javax.annotation:javax.annotation-api:1.3.2")
-    shadow("de.themoep:minedown:1.7.1-SNAPSHOT")
-    shadow("com.zaxxer:HikariCP:3.4.2")
-    shadow("com.j256.ormlite:ormlite-jdbc:6.0")
+    implementation("org.springframework:spring-context:5.3.9")
+    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+    implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
+    implementation("javax.annotation:javax.annotation-api:1.3.2")
+    implementation("de.themoep:minedown:1.7.1-SNAPSHOT")
+    implementation("com.zaxxer:HikariCP:3.4.2")
+    implementation("com.j256.ormlite:ormlite-jdbc:6.0")
     paperDevBundle("1.17.1-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.4.0")
@@ -54,7 +60,7 @@ dependencies {
 
 tasks {
     shadowJar {
-        archiveClassifier.set("")
+        archiveFileName.set("${project.name}-${project.version}.${archiveExtension.getOrElse("jar")}")
         dependencies {
             relocate("net.wesjd.anvilgui", "ru.ckateptb.tablecloth.gui.anvil")
             relocate("xyz.upperlevel.spigot.book", "ru.ckateptb.tablecloth.gui.book")
@@ -64,7 +70,10 @@ tasks {
         }
     }
     build {
-        dependsOn(reobfJar)
+        dependsOn(shadowJar)
+    }
+    withType<Sign>().configureEach {
+        onlyIf { !isSnapshot() }
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
@@ -73,11 +82,60 @@ tasks {
         filesMatching("plugin.yml") {
             expand("projectVersion" to project.version)
         }
+        from("LICENSE") {
+            rename { "${project.name.toUpperCase()}_${it}" }
+        }
     }
 }
 
 publishing {
-    publications.create<MavenPublication>("maven") {
-        from(components["java"])
+    publications {
+        publications.create<MavenPublication>("maven") {
+            artifacts {
+                artifact(tasks.shadowJar) {
+                    classifier = ""
+                }
+                if (!isSnapshot()) {
+                    artifact(tasks.javadoc)
+                }
+                artifact(tasks["sourcesJar"])
+            }
+            pom {
+                name.set(project.name)
+                url.set("https://github.com/${githubAuthor}/${githubName}")
+                licenses {
+                    license {
+                        name.set("The GNU Affero General Public License, Version 3.0")
+                        url.set("https://www.gnu.org/licenses/agpl-3.0.txt")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:https://github.com/${githubAuthor}/${githubName}.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/${githubAuthor}/${githubName}.git")
+                    url.set("https://github.com/${githubAuthor}/${githubName}")
+                }
+                issueManagement {
+                    system.set("Github")
+                    url.set("https://github.com/${githubAuthor}/${githubName}/issues")
+                }
+            }
+        }
+        repositories {
+            maven {
+                name = githubName
+                url = uri("https://maven.pkg.github.com/${githubAuthor}/${githubName}")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
     }
 }
+
+
+signing {
+    sign(publishing.publications["maven"])
+}
+
+fun isSnapshot() = project.version.toString().endsWith("-SNAPSHOT")

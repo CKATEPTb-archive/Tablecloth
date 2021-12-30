@@ -6,4 +6,4 @@ api-version: 1.17
 depend: [ ProtocolLib, CommandAPI ]
 softdepend: [  ]
 authors: [ CKATEPTb ]
-description: API for my plugins, with built-in spring ioc
+description: API for my plugins, with built-in spring IoC
