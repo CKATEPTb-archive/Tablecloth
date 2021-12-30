@@ -37,7 +37,6 @@ repositories {
     maven {
         url = uri("https://repo.minebench.de/")
         content {
-            // this repository *only* contains artifacts with group "my.company"
             includeGroup("de.themoep")
         }
     }
