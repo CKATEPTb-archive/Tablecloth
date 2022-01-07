@@ -9,7 +9,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import ru.ckateptb.tablecloth.collision.Collider;
 import ru.ckateptb.tablecloth.collision.RayTrace;
 import ru.ckateptb.tablecloth.collision.collider.AABB;
 import ru.ckateptb.tablecloth.collision.collider.DummyCollider;
@@ -17,7 +16,6 @@ import ru.ckateptb.tablecloth.math.FastMath;
 import ru.ckateptb.tablecloth.math.Vector3d;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -137,22 +135,14 @@ public final class WorldUtils {
     }
 
     public static double getDistanceAboveGround(Entity entity) {
-        int minHeight = entity.getWorld().getMinHeight();
-        int deltaHeight = entity.getWorld().getMaxHeight() - minHeight;
-        AABB from = AABB.from(entity);
-        AABB entityBounds = from.grow(new Vector3d(0, deltaHeight, 0));
-        Block origin = entity.getLocation().getBlock();
-        for (int i = 0; i < deltaHeight; i++) {
-            Block check = origin.getRelative(BlockFace.DOWN, i);
-            if (check.getY() <= minHeight) {
-                break;
-            }
-            AABB checkBounds = check.isLiquid() ? AABB.BLOCK_BOUNDS.at(new Vector3d(check)) : AABB.from(check);
-            if (checkBounds.intersects(entityBounds)) {
-                return Math.max(0, from.min.getY() - checkBounds.max.getY());
-            }
-        }
-        return deltaHeight;
+        return getDistanceAboveGround(entity, true);
+    }
+
+    public static double getDistanceAboveGround(Entity entity, boolean ignoreLiquids) {
+        World world = entity.getWorld();
+        Location location = entity.getLocation();
+        Block block = RayTrace.of(new Vector3d(location), Vector3d.MINUS_J).type(RayTrace.Type.BLOCK).range(Math.min(world.getMaxHeight(), location.getY())).ignoreLiquids(ignoreLiquids).result(world).block();
+        return location.getY() - block.getBoundingBox().getMax().getY();
     }
 
 
