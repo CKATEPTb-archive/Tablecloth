@@ -142,7 +142,11 @@ public final class WorldUtils {
         World world = entity.getWorld();
         Location location = entity.getLocation();
         Block block = RayTrace.of(new Vector3d(location), Vector3d.MINUS_J).type(RayTrace.Type.BLOCK).range(Math.min(world.getMaxHeight(), location.getY())).ignoreLiquids(ignoreLiquids).result(world).block();
-        return location.getY() - block.getBoundingBox().getMax().getY();
+        double y = block.getBoundingBox().getMax().getY();
+        if(block.isLiquid()) {
+            y = AABB.BLOCK_BOUNDS.at(new Vector3d(block.getLocation())).max.getY();
+        }
+        return location.getY() - y;
     }
 
 
