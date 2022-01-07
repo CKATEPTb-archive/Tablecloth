@@ -139,7 +139,8 @@ public final class WorldUtils {
     public static double getDistanceAboveGround(Entity entity) {
         int minHeight = entity.getWorld().getMinHeight();
         int deltaHeight = entity.getWorld().getMaxHeight() - minHeight;
-        AABB entityBounds = AABB.from(entity).grow(new Vector3d(0, deltaHeight, 0));
+        AABB from = AABB.from(entity);
+        AABB entityBounds = from.grow(new Vector3d(0, deltaHeight, 0));
         Block origin = entity.getLocation().getBlock();
         for (int i = 0; i < deltaHeight; i++) {
             Block check = origin.getRelative(BlockFace.DOWN, i);
@@ -148,7 +149,7 @@ public final class WorldUtils {
             }
             AABB checkBounds = check.isLiquid() ? AABB.BLOCK_BOUNDS.at(new Vector3d(check)) : AABB.from(check);
             if (checkBounds.intersects(entityBounds)) {
-                return Math.max(0, entity.getBoundingBox().getMinY() - checkBounds.max.getY());
+                return Math.max(0, from.min.getY() - checkBounds.max.getY());
             }
         }
         return deltaHeight;
