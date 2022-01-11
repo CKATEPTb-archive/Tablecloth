@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.ckateptb"
-version = "1.0.2-SNAPSHOT"
+version = "1.0.3-SNAPSHOT"
 var githubName = "Tablecloth"
 var githubOwner = "CKATEPTb"
 
@@ -50,6 +50,8 @@ dependencies {
     implementation("de.themoep:minedown:1.7.1-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:3.4.2")
     implementation("com.j256.ormlite:ormlite-jdbc:6.0")
+    implementation("xyz.xenondevs:particle:1.7")
+    implementation("org.jooq:joor:0.9.13")
     paperDevBundle("1.17.1-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.4.0")
@@ -66,6 +68,8 @@ tasks {
             relocate("de.themoep.minedown", "ru.ckateptb.tablecloth.minedown")
             relocate("com.j256.ormlite", "ru.ckateptb.tablecloth.storage.ormlite")
             relocate("com.zaxxer.hikari", "ru.ckateptb.tablecloth.storage.hikari")
+            relocate("xyz.xenondevs.particle", "ru.ckateptb.tablecloth.particle")
+            relocate("org.joor", "ru.ckateptb.tablecloth.reflection")
         }
     }
     build {
