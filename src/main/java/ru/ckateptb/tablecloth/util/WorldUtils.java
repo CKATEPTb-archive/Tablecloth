@@ -2,166 +2,32 @@ package ru.ckateptb.tablecloth.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import ru.ckateptb.tablecloth.collision.RayTrace;
-import ru.ckateptb.tablecloth.collision.collider.AABB;
-import ru.ckateptb.tablecloth.collision.collider.DummyCollider;
-import ru.ckateptb.tablecloth.math.FastMath;
-import ru.ckateptb.tablecloth.math.Vector3d;
+import ru.ckateptb.tablecloth.collision.callback.CollisionCallbackResult;
+import ru.ckateptb.tablecloth.collision.collider.AxisAlignedBoundingBoxCollider;
+import ru.ckateptb.tablecloth.math.ImmutableVector;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class WorldUtils {
-
-    /**
-     * @return {@link #getNearbyBlocks(Location, double, Predicate, int)} with predicate being always true and no block limit.
-     */
-    public static List<Block> getNearbyBlocks(Location location, double radius) {
-        return getNearbyBlocks(location, radius, block -> true, 0);
-    }
-
-    /**
-     * @return {@link #getNearbyBlocks(Location, double, Predicate, int)} with the given predicate and no block limit.
-     */
-    public static List<Block> getNearbyBlocks(Location location, double radius, Predicate<Block> predicate) {
-        return getNearbyBlocks(location, radius, predicate, 0);
-    }
-
-    /**
-     * Collects all blocks in a sphere that satisfy the given predicate.
-     * <p> Note: Limit is only respected if positive. Otherwise all blocks that satisfy the given predicate are collected.
-     *
-     * @param location  the center point
-     * @param radius    the radius of the sphere
-     * @param predicate the predicate that needs to be satisfied for every block
-     * @param limit     the amount of blocks to collect
-     * @return all collected blocks
-     */
-    public static List<Block> getNearbyBlocks(Location location, double radius, Predicate<Block> predicate, int limit) {
-        int r = FastMath.ceil(radius) + 1;
-        double originX = location.getX();
-        double originY = location.getY();
-        double originZ = location.getZ();
-        Vector3d pos = new Vector3d(location);
-        List<Block> blocks = new ArrayList<>();
-        for (double x = originX - r; x <= originX + r; x++) {
-            for (double y = originY - r; y <= originY + r; y++) {
-                for (double z = originZ - r; z <= originZ + r; z++) {
-                    Vector3d loc = new Vector3d(x, y, z);
-                    if (pos.distanceSq(loc) > radius * radius) {
-                        continue;
-                    }
-                    Block block = loc.toBlock(location.getWorld());
-                    if (predicate.test(block)) {
-                        blocks.add(block);
-                        if (limit > 0 && blocks.size() >= limit) {
-                            return blocks;
-                        }
-                    }
-                }
-            }
-        }
-        return blocks;
-    }
-
-    /**
-     * @return {@link #getNearbyBlocks(World, AABB, Predicate, int)} with predicate being always true and no block limit.
-     */
-    public static List<Block> getNearbyBlocks(World world, AABB box) {
-        return getNearbyBlocks(world, box, block -> true, 0);
-    }
-
-    /**
-     * @return {@link #getNearbyBlocks(World, AABB, Predicate, int)} with the given predicate and no block limit.
-     */
-    public static List<Block> getNearbyBlocks(World world, AABB box, Predicate<Block> predicate) {
-        return getNearbyBlocks(world, box, predicate, 0);
-    }
-
-    /**
-     * Collects all blocks inside a bounding box that satisfy the given predicate.
-     * <p> Note: Limit is only respected if positive. Otherwise all blocks that satisfy the given predicate are collected.
-     *
-     * @param world     the world to check
-     * @param box       the bounding box to check
-     * @param predicate the predicate that needs to be satisfied for every block
-     * @param limit     the amount of blocks to collect
-     * @return all collected blocks
-     */
-    public static List<Block> getNearbyBlocks(World world, AABB box, Predicate<Block> predicate, int limit) {
-        if (box == DummyCollider.INSTANCE) {
-            return List.of();
-        }
-        List<Block> blocks = new ArrayList<>();
-        for (double x = box.min.getX(); x <= box.max.getX(); x++) {
-            for (double y = box.min.getY(); y <= box.max.getY(); y++) {
-                for (double z = box.min.getZ(); z <= box.max.getZ(); z++) {
-                    Vector3d loc = new Vector3d(x, y, z);
-                    Block block = loc.toBlock(world);
-                    if (predicate.test(block)) {
-                        blocks.add(block);
-                        if (limit > 0 && blocks.size() >= limit) {
-                            return blocks;
-                        }
-                    }
-                }
-            }
-        }
-        return blocks;
-    }
-
     public static boolean isOnGround(Entity entity) {
         if (!(entity instanceof Player)) {
             return entity.isOnGround();
         }
-        AABB entityBounds = AABB.from(entity).grow(new Vector3d(0, 0.05, 0));
-        AABB floorBounds = new AABB(new Vector3d(-1, -0.1, -1), new Vector3d(1, 0.1, 1)).at(new Vector3d(entity.getLocation()));
-        for (Block block : getNearbyBlocks(entity.getWorld(), floorBounds, b -> !b.isPassable())) {
-            if (entityBounds.intersects(AABB.from(block))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static double getDistanceAboveGround(Entity entity) {
-        return getDistanceAboveGround(entity, true);
-    }
-
-    public static double getDistanceAboveGround(Entity entity, boolean ignoreLiquids) {
-        World world = entity.getWorld();
-        Location location = entity.getLocation();
-        Block block = RayTrace.of(new Vector3d(location), Vector3d.MINUS_J).type(RayTrace.Type.BLOCK).range(Math.min(world.getMaxHeight(), location.getY())).ignoreLiquids(ignoreLiquids).result(world).block();
-        double y = block.getBoundingBox().getMax().getY();
-        if(block.isLiquid()) {
-            y = AABB.BLOCK_BOUNDS.at(new Vector3d(block.getLocation())).max.getY();
-        }
-        return location.getY() - y;
-    }
-
-
-    public static Vector3d getEntityCenter(Entity entity) {
-        return new Vector3d(entity.getLocation()).add(new Vector3d(0, entity.getHeight() / 2, 0));
-    }
-
-    public static boolean canView(LivingEntity user, Location location, double maxRange) {
-        return canView(user, location.getBlock(), maxRange);
-    }
-
-    public static boolean canView(LivingEntity user, Block block, double maxRange) {
-        if (!user.getWorld().equals(block.getWorld())) return false;
-        Block viewBlock = RayTrace.of(user).range(maxRange).ignoreLiquids(true).result(user.getWorld()).block();
-        return block.equals(viewBlock);
+        AxisAlignedBoundingBoxCollider entityBounds = new AxisAlignedBoundingBoxCollider(entity).grow(new ImmutableVector(0, 0.05, 0));
+        AxisAlignedBoundingBoxCollider floorBounds = new AxisAlignedBoundingBoxCollider(entity.getWorld(), new ImmutableVector(-1, -0.1, -1), new ImmutableVector(1, 0.1, 1)).at(new ImmutableVector(entity.getLocation()));
+        AtomicBoolean result = new AtomicBoolean(false);
+        floorBounds.handleBlockCollisions(block -> {
+            result.set(entityBounds.intersects(new AxisAlignedBoundingBoxCollider(block).at(new ImmutableVector(block))));
+            return result.get() ? CollisionCallbackResult.END : CollisionCallbackResult.CONTINUE;
+        });
+        return result.get();
     }
 
     public static Optional<Block> findTopBlock(Block block, int height, Predicate<Block> predicate) {

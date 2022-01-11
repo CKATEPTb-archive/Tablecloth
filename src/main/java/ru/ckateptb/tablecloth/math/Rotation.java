@@ -1,4 +1,25 @@
+/*
+ * Copyright 2020-2021 Moros
+ *
+ * This file is part of Bending.
+ *
+ * Bending is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Bending is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Bending. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package ru.ckateptb.tablecloth.math;
+
+import org.jetbrains.annotations.NotNull;
 
 public class Rotation {
     private final double q0;
@@ -13,7 +34,7 @@ public class Rotation {
         this.q3 = q3;
     }
 
-    public Rotation(Vector3d axis, double angle) throws IllegalArgumentException {
+    public Rotation(ImmutableVector axis, double angle) throws IllegalArgumentException {
         double norm = axis.length();
         if (norm == 0) {
             throw new IllegalArgumentException();
@@ -65,24 +86,27 @@ public class Rotation {
 
     /**
      * Apply the rotation to a vector.
-     *
      * @param u vector to apply the rotation to
      * @return a new vector which is the image of u by the rotation
      */
-    public Vector3d applyTo(Vector3d u) {
+    public ImmutableVector applyTo(ImmutableVector u) {
         double x = u.getX();
         double y = u.getY();
         double z = u.getZ();
         double s = q1 * x + q2 * y + q3 * z;
-        return new Vector3d(2 * (q0 * (x * q0 - (q2 * z - q3 * y)) + s * q1) - x,
+        return getImmutableVector(x, y, z, s, q0);
+    }
+
+    @NotNull
+    private ImmutableVector getImmutableVector(double x, double y, double z, double s, double q0) {
+        return new ImmutableVector(2 * (q0 * (x * q0 - (q2 * z - q3 * y)) + s * q1) - x,
                 2 * (q0 * (y * q0 - (q3 * x - q1 * z)) + s * q2) - y,
                 2 * (q0 * (z * q0 - (q1 * y - q2 * x)) + s * q3) - z);
     }
 
     /**
      * Apply the rotation to a vector stored in an array.
-     *
-     * @param in  an array with three items which stores vector to rotate
+     * @param in an array with three items which stores vector to rotate
      * @param out an array with three items to put result to (it can be the same array as in)
      */
     public void applyTo(final double[] in, final double[] out) {
@@ -92,6 +116,10 @@ public class Rotation {
 
         final double s = q1 * x + q2 * y + q3 * z;
 
+        applyTo(out, x, y, z, s, q0);
+    }
+
+    private void applyTo(double[] out, double x, double y, double z, double s, double q0) {
         out[0] = 2 * (q0 * (x * q0 - (q2 * z - q3 * y)) + s * q1) - x;
         out[1] = 2 * (q0 * (y * q0 - (q3 * x - q1 * z)) + s * q2) - y;
         out[2] = 2 * (q0 * (z * q0 - (q1 * y - q2 * x)) + s * q3) - z;
@@ -99,11 +127,10 @@ public class Rotation {
 
     /**
      * Apply the inverse of the rotation to a vector.
-     *
      * @param u vector to apply the inverse of the rotation to
      * @return a new vector which such that u is its image by the rotation
      */
-    public Vector3d applyInverseTo(Vector3d u) {
+    public ImmutableVector applyInverseTo(ImmutableVector u) {
         double x = u.getX();
         double y = u.getY();
         double z = u.getZ();
@@ -111,15 +138,12 @@ public class Rotation {
         double s = q1 * x + q2 * y + q3 * z;
         double m0 = -q0;
 
-        return new Vector3d(2 * (m0 * (x * m0 - (q2 * z - q3 * y)) + s * q1) - x,
-                2 * (m0 * (y * m0 - (q3 * x - q1 * z)) + s * q2) - y,
-                2 * (m0 * (z * m0 - (q1 * y - q2 * x)) + s * q3) - z);
+        return getImmutableVector(x, y, z, s, m0);
     }
 
     /**
      * Apply the inverse of the rotation to a vector stored in an array.
-     *
-     * @param in  an array with three items which stores vector to rotate
+     * @param in an array with three items which stores vector to rotate
      * @param out an array with three items to put result to (it can be the same array as in)
      */
     public void applyInverseTo(final double[] in, final double[] out) {
@@ -130,9 +154,7 @@ public class Rotation {
         final double s = q1 * x + q2 * y + q3 * z;
         final double m0 = -q0;
 
-        out[0] = 2 * (m0 * (x * m0 - (q2 * z - q3 * y)) + s * q1) - x;
-        out[1] = 2 * (m0 * (y * m0 - (q3 * x - q1 * z)) + s * q2) - y;
-        out[2] = 2 * (m0 * (z * m0 - (q1 * y - q2 * x)) + s * q3) - z;
+        applyTo(out, x, y, z, s, m0);
     }
 
     public Rotation applyTo(Rotation r) {
