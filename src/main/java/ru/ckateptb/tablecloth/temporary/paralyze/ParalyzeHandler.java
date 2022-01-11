@@ -168,7 +168,7 @@ public class ParalyzeHandler implements Listener {
         World toWorld = toLocation.getWorld();
         if (fromWorld != null && toWorld != null && !fromWorld.equals(toWorld)) return;
         if (fromLocation.getBlock().getLocation().equals(toLocation.getBlock().getLocation())) return;
-        if (entity.hasMetadata("tablecloth:paralyze")) {
+        if (config.getParalyzeType() == ParalyzeType.MOVE_HANDLER && entity.hasMetadata("tablecloth:paralyze")) {
             entity.getMetadata("tablecloth:paralyze").forEach(metadataValue -> {
                 if (metadataValue.value() instanceof TemporaryParalyze paralyze) {
                     event.setCancelled(true);

@@ -96,6 +96,7 @@ public class TemporaryParalyze extends AbstractTemporary {
                 this.armorStand.setCanPickupItems(false);
                 this.armorStand.setMarker(false);
                 this.armorStand.setVisible(false);
+                player.addPassenger(this.armorStand);
                 player.setSneaking(false);
                 spectateArmorStand();
             }
