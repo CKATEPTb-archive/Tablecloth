@@ -44,7 +44,7 @@ repositories {
 
 dependencies {
     implementation("org.springframework:spring-context:5.3.9")
-    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+//    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
     implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
     implementation("de.themoep:minedown:1.7.1-SNAPSHOT")
@@ -61,7 +61,7 @@ tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.${archiveExtension.getOrElse("jar")}")
         dependencies {
-            relocate("net.wesjd.anvilgui", "ru.ckateptb.tablecloth.gui.anvil")
+//            relocate("net.wesjd.anvilgui", "ru.ckateptb.tablecloth.gui.anvil")
             relocate("xyz.upperlevel.spigot.book", "ru.ckateptb.tablecloth.gui.book")
             relocate("de.themoep.minedown", "ru.ckateptb.tablecloth.minedown")
             relocate("com.j256.ormlite", "ru.ckateptb.tablecloth.storage.ormlite")

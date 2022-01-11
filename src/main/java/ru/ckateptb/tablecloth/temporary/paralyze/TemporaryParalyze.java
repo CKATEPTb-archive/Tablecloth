@@ -9,7 +9,8 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.wesjd.anvilgui.AnvilGUI;
+//import net.wesjd.anvilgui.AnvilGUI;
+import org.apache.commons.lang.NotImplementedException;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -49,7 +50,7 @@ public class TemporaryParalyze extends AbstractTemporary {
     public ArmorStand armorStand;
     private TemporaryBossBar temporaryBossBar;
     private boolean hasAI;
-    private AnvilGUI anvilGUI;
+//    private AnvilGUI anvilGUI;
     private GameMode originalGameMode;
 
     public TemporaryParalyze(LivingEntity livingEntity, long duration) {
@@ -78,15 +79,16 @@ public class TemporaryParalyze extends AbstractTemporary {
             this.livingEntity.setMetadata("tablecloth:paralyze", new FixedMetadataValue(this.plugin, this));
             ParalyzeType paralyzeType = config.getParalyzeType();
             if (paralyzeType == ParalyzeType.INVENTORY) {
-                anvilGUI = new AnvilGUI.Builder()
-                        .preventClose()
-                        .title(paralyzeName)
-                        .plugin(Tablecloth.getInstance())
-                        .text(paralyzeName)
-                        .onComplete((player1, text) -> AnvilGUI.Response.text(paralyzeName))
-                        .itemLeft(new ItemStack(Material.BARRIER))
-                        .itemRight(new ItemStack(Material.BARRIER))
-                        .open(player);
+                throw new NotImplementedException("ParalyzeType.INVENTORY don't Implemented yet");
+//                anvilGUI = new AnvilGUI.Builder()
+//                        .preventClose()
+//                        .title(paralyzeName)
+//                        .plugin(Tablecloth.getInstance())
+//                        .text(paralyzeName)
+//                        .onComplete((player1, text) -> AnvilGUI.Response.text(paralyzeName))
+//                        .itemLeft(new ItemStack(Material.BARRIER))
+//                        .itemRight(new ItemStack(Material.BARRIER))
+//                        .open(player);
             } else if (paralyzeType == ParalyzeType.ARMORSTAND) {
                 this.originalGameMode = player.getGameMode();
                 this.armorStand = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
@@ -140,7 +142,7 @@ public class TemporaryParalyze extends AbstractTemporary {
     @Override
     public void revert() {
         if (livingEntity.hasMetadata("tablecloth:paralyze")) livingEntity.removeMetadata("tablecloth:paralyze", plugin);
-        if (anvilGUI != null) anvilGUI.closeInventory();
+//        if (anvilGUI != null) anvilGUI.closeInventory();
         if (armorStand != null) {
             this.armorStand.remove();
             if (livingEntity instanceof Player player) {
