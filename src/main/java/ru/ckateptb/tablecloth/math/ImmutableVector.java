@@ -71,7 +71,11 @@ public class ImmutableVector extends Vector {
     }
 
     public ImmutableVector normalize() {
-        return normalizeOrElse(ImmutableVector.PLUS_I);
+        return normalize(ImmutableVector.PLUS_I);
+    }
+
+    public ImmutableVector normalize(ImmutableVector def) {
+        return normalizeOrElse(def);
     }
 
     public ImmutableVector normalizeOrElse(ImmutableVector def) {
@@ -310,5 +314,9 @@ public class ImmutableVector extends Vector {
                 .map(Map.Entry::getKey)
                 .map(block -> new AxisAlignedBoundingBoxCollider(block).at(new ImmutableVector(block)).getMax().getY())
                 .orElse(0d);
+    }
+
+    public Block toBlock(World world) {
+        return toLocation(world).getBlock();
     }
 }

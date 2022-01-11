@@ -52,6 +52,12 @@ public class AxisAlignedBoundingBoxCollider extends AbstractCollider {
         if(collider instanceof RayCollider rayCollider) {
             return rayCollider.intersects(this);
         }
+        if (collider instanceof OrientedBoundingBoxCollider orientedBoundingBoxCollider) {
+            return orientedBoundingBoxCollider.intersects(this);
+        }
+        if (collider instanceof CompositeCollider compositeCollider) {
+            return compositeCollider.intersects(this);
+        }
         return false;
     }
 

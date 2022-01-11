@@ -33,7 +33,18 @@ public class SphereCollider extends AbstractCollider {
         if (collider instanceof RayCollider rayCollider) {
             return rayCollider.intersects(this);
         }
+        if (collider instanceof OrientedBoundingBoxCollider orientedBoundingBoxCollider) {
+            return intersects(orientedBoundingBoxCollider);
+        }
+        if (collider instanceof CompositeCollider compositeCollider) {
+            return compositeCollider.intersects(this);
+        }
         return false;
+    }
+
+    private boolean intersects(OrientedBoundingBoxCollider orientedBoundingBoxCollider) {
+        ImmutableVector vector = center.subtract(orientedBoundingBoxCollider.closestPosition(center));
+        return vector.dot(vector) <= radius * radius;
     }
 
     private boolean intersects(SphereCollider collider) {

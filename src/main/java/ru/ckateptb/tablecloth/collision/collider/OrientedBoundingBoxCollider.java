@@ -66,17 +66,20 @@ public class OrientedBoundingBoxCollider extends AbstractCollider {
         if(!collider.getWorld().equals(world)) {
             return false;
         }
-        if (collider instanceof SphereCollider) {
-            return collider.intersects(this);
+        if (collider instanceof SphereCollider sphereCollider) {
+            return sphereCollider.intersects(this);
         }
-        if (collider instanceof AxisAlignedBoundingBoxCollider aabb) {
-            return intersects(new OrientedBoundingBoxCollider(aabb));
+        if (collider instanceof AxisAlignedBoundingBoxCollider axisAlignedBoundingBoxCollider) {
+            return intersects(new OrientedBoundingBoxCollider(axisAlignedBoundingBoxCollider));
         }
-        if (collider instanceof OrientedBoundingBoxCollider obb) {
-            return intersects(obb);
+        if (collider instanceof OrientedBoundingBoxCollider orientedBoundingBoxCollider) {
+            return intersects(orientedBoundingBoxCollider);
         }
-        if (collider instanceof DiskCollider) {
-            return collider.intersects(this);
+        if (collider instanceof RayCollider rayCollider) {
+            return rayCollider.intersects(this);
+        }
+        if (collider instanceof CompositeCollider compositeCollider) {
+            return compositeCollider.intersects(this);
         }
         return false;
     }

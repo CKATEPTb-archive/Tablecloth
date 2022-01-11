@@ -91,6 +91,14 @@ public interface Collider {
         return handleBlockCollisions(true, callback, filter);
     }
 
+    default boolean handleBlockCollisions(boolean ignoreLiquids, BlockCollisionCallback callback) {
+        return handleBlockCollisions(true, ignoreLiquids, callback);
+    }
+
+    default boolean handleBlockCollisions(boolean ignorePassable, boolean ignoreLiquids, BlockCollisionCallback callback) {
+        return handleBlockCollisions(ignorePassable, ignoreLiquids, callback, (block -> true));
+    }
+
     default boolean handleBlockCollisions(boolean ignoreLiquids, BlockCollisionCallback callback, Predicate<Block> filter) {
         return handleBlockCollisions(true, ignoreLiquids, callback, filter);
     }
