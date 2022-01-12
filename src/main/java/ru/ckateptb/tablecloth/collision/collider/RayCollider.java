@@ -90,20 +90,24 @@ public class RayCollider extends AbstractCollider {
         return this.getBlock(ignoreLiquids, ignorePassable, true, filter);
     }
 
-    public Optional<Block> getBlock(boolean ignoreLiquids, boolean ignorePassable, boolean ignoreBlockBounds, Predicate<Block> filter) {
+    public Optional<Block> getBlock(boolean ignoreLiquids, boolean ignorePassable, boolean ignoreObstacles, Predicate<Block> filter) {
         BlockIterator it = new BlockIterator(world, original, direction, raySize, Math.min(100, (int) Math.ceil(maxDistance)));
         while (it.hasNext()) {
             Block block = it.next();
-            if (ignoreLiquids && block.isLiquid()) {
-                continue;
-            }
-            if (ignorePassable && block.isPassable()) {
-                continue;
+            boolean passable = block.isPassable();
+            if (passable) {
+                if (block.isLiquid()) {
+                    if (ignoreLiquids) {
+                        continue;
+                    }
+                } else if (ignorePassable) {
+                    continue;
+                }
             }
             if (filter.test(block)) {
                 return Optional.of(block);
             }
-            if (!ignoreBlockBounds && block.isPassable()) {
+            if (!ignoreObstacles && !passable) {
                 break;
             }
         }

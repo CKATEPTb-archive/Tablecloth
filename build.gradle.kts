@@ -103,36 +103,36 @@ publishing {
                 }
                 artifact(tasks["sourcesJar"])
             }
-            pom {
-                name.set(project.name)
-                url.set("https://github.com/${githubOwner}/${githubName}")
-                licenses {
-                    license {
-                        name.set("The GNU Affero General Public License, Version 3.0")
-                        url.set("https://www.gnu.org/licenses/agpl-3.0.txt")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:https://github.com/${githubOwner}/${githubName}.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/${githubOwner}/${githubName}.git")
-                    url.set("https://github.com/${githubOwner}/${githubName}")
-                }
-                issueManagement {
-                    system.set("Github")
-                    url.set("https://github.com/${githubOwner}/${githubName}/issues")
-                }
-            }
+//            pom {
+//                name.set(project.name)
+//                url.set("https://github.com/${githubOwner}/${githubName}")
+//                licenses {
+//                    license {
+//                        name.set("The GNU Affero General Public License, Version 3.0")
+//                        url.set("https://www.gnu.org/licenses/agpl-3.0.txt")
+//                    }
+//                }
+//                scm {
+//                    connection.set("scm:git:https://github.com/${githubOwner}/${githubName}.git")
+//                    developerConnection.set("scm:git:ssh://git@github.com/${githubOwner}/${githubName}.git")
+//                    url.set("https://github.com/${githubOwner}/${githubName}")
+//                }
+//                issueManagement {
+//                    system.set("Github")
+//                    url.set("https://github.com/${githubOwner}/${githubName}/issues")
+//                }
+//            }
         }
-        repositories {
-            maven {
-                name = githubName
-                url = uri("https://maven.pkg.github.com/${githubOwner}/${githubName}")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
-                }
-            }
-        }
+//        repositories {
+//            maven {
+//                name = githubName
+//                url = uri("https://maven.pkg.github.com/${githubOwner}/${githubName}")
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//            }
+//        }
     }
 }
 
