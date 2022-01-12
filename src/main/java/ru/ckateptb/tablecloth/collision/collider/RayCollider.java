@@ -127,15 +127,15 @@ public class RayCollider extends AbstractCollider {
             Optional<Block> optional = getBlock(ignoreLiquid, ignorePassable, true, blockFilter);
             if (optional.isPresent()) {
                 Block block = optional.get();
-                ImmutableVector immutableVector = new ImmutableVector(block.getLocation());
-                blockPosition = original.subtract(immutableVector).normalize();
+                ImmutableVector immutableVector = new ImmutableVector(block.getLocation().toCenterLocation());
+                blockPosition = original.add(direction.normalize().multiply(original.distance(immutableVector) - 0.5));
                 this.maxDistance = original.distance(blockPosition);
             }
         }
 
         if (!ignoreEntity) {
             Optional<Entity> optional = getEntity(entityFilter);
-            if(optional.isPresent()) {
+            if (optional.isPresent()) {
                 Entity entity = optional.get();
                 entityPosition = new ImmutableVector(entity.getLocation()).add(new ImmutableVector(0, entity.getHeight() / 2, 0));
             }
