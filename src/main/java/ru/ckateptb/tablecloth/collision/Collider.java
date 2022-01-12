@@ -120,7 +120,9 @@ public interface Collider {
                         continue;
                     }
                     Block block = loc.toLocation(world).getBlock();
-                    if ((block.isPassable() && !ignorePassable) && filter.test(block) && block.isLiquid() && !ignoreLiquids) {
+                    if(block.isPassable() && ignorePassable) continue;
+                    if(block.isLiquid() && ignoreLiquids) continue;
+                    if (filter.test(block)) {
                         AxisAlignedBoundingBoxCollider collider = new AxisAlignedBoundingBoxCollider(block).at(new ImmutableVector(block));
                         if (intersects(collider)) {
                             result = true;
