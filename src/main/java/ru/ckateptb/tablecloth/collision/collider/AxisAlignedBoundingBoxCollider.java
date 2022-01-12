@@ -73,7 +73,8 @@ public class AxisAlignedBoundingBoxCollider extends AbstractCollider {
     @Override
     public AxisAlignedBoundingBoxCollider at(Vector point) {
         ImmutableVector halfExtends = getHalfExtents();
-        return new AxisAlignedBoundingBoxCollider(world, point.add(halfExtends.negate()), point.add(halfExtends));
+        ImmutableVector immutablePoint = new ImmutableVector(point);
+        return new AxisAlignedBoundingBoxCollider(world, immutablePoint.add(halfExtends.negate()), immutablePoint.add(halfExtends));
     }
 
     @Override
