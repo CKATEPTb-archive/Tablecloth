@@ -62,7 +62,7 @@ public class AxisAlignedBoundingBoxCollider extends AbstractCollider {
     }
 
     private boolean intersects(AxisAlignedBoundingBoxCollider collider) {
-        return this.toBoundingBox().contains(collider.toBoundingBox());
+        return this.toBoundingBox().overlaps(collider.toBoundingBox());
     }
 
     @Override
