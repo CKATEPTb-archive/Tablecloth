@@ -53,39 +53,17 @@ public class SphereCollider extends AbstractCollider {
 
     public boolean intersects(AxisAlignedBoundingBoxCollider collider) {
         if (!collider.getWorld().equals(this.world)) return false;
-        float dmin = 0;
-
-        Vector min = collider.getMin();
-        Vector max = collider.getMax();
-
-        double centerX = center.getX();
-        double minX = min.getX();
-        double maxX = max.getX();
-        if (centerX < minX) {
-            dmin += Math.pow(centerX - minX, 2);
-        } else if (centerX > maxX) {
-            dmin += Math.pow(centerX - maxX, 2);
+        Vector minVector = collider.getMin();
+        Vector maxVector = collider.getMax();
+        double[] center = {this.center.getX(), this.center.getY(), this.center.getZ()};
+        double[] min = {minVector.getX(), minVector.getY(), minVector.getZ()};
+        double[] max = {maxVector.getX(), maxVector.getY(), maxVector.getZ()};
+        double result = 0;
+        for (int i = 0; i < 3; i++) {
+            if (center[i] < min[i]) result += Math.pow(center[i] - min[i], 2);
+            else if (center[i] > max[i]) result += Math.pow(center[i] - max[i], 2);
         }
-
-        double centerY = center.getY();
-        double minY = min.getY();
-        double maxY = max.getY();
-        if (centerY < minY) {
-            dmin += Math.pow(centerY - minY, 2);
-        } else if (centerY > maxY) {
-            dmin += Math.pow(centerY - maxY, 2);
-        }
-
-        double centerZ = center.getZ();
-        double minZ = min.getZ();
-        double maxZ = max.getZ();
-        if (centerZ < minZ) {
-            dmin += Math.pow(centerZ - minZ, 2);
-        } else if (centerZ > maxZ) {
-            dmin += Math.pow(centerZ - maxZ, 2);
-        }
-
-        return dmin <= Math.pow(radius, 2);
+        return result <= Math.pow(radius, 2);
     }
 
     @Override
