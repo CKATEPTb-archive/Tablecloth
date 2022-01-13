@@ -60,6 +60,7 @@ public class DebugColliderService {
     }
 
     public void addCollider(Collider collider) {
+        if(!config.isDebugCollider()) return;
         asyncService.supplyAsync(() -> {
             while (true) {
                 if (!collidersLocked) {
@@ -72,6 +73,7 @@ public class DebugColliderService {
     }
 
     public void removeCollider(Collider collider) {
+        if(!config.isDebugCollider()) return;
         asyncService.supplyAsync(() -> {
             while (true) {
                 if (!collidersLocked) {
@@ -84,6 +86,7 @@ public class DebugColliderService {
     }
 
     public void clearColliders() {
+        if(!config.isDebugCollider()) return;
         asyncService.supplyAsync(() -> {
             while (true) {
                 if (!collidersLocked) {
