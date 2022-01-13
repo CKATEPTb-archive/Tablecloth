@@ -12,6 +12,7 @@ import org.bukkit.util.Vector;
 import ru.ckateptb.tablecloth.collision.callback.BlockCollisionCallback;
 import ru.ckateptb.tablecloth.collision.callback.CollisionCallbackResult;
 import ru.ckateptb.tablecloth.collision.callback.EntityCollisionCallback;
+import ru.ckateptb.tablecloth.collision.callback.PositionCollisionCallback;
 import ru.ckateptb.tablecloth.collision.collider.AxisAlignedBoundingBoxCollider;
 import ru.ckateptb.tablecloth.math.ImmutableVector;
 
@@ -120,14 +121,39 @@ public interface Collider {
                         continue;
                     }
                     Block block = loc.toLocation(world).getBlock();
-                    if(block.isPassable() && ignorePassable) continue;
-                    if(block.isLiquid() && ignoreLiquids) continue;
+                    if (block.isPassable() && ignorePassable) continue;
+                    if (block.isLiquid() && ignoreLiquids) continue;
                     if (filter.test(block)) {
                         AxisAlignedBoundingBoxCollider collider = new AxisAlignedBoundingBoxCollider(block).at(new ImmutableVector(block));
                         if (intersects(collider)) {
                             result = true;
                             if (callback.onCollision(block) == CollisionCallbackResult.END) return true;
                         }
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    default boolean handlePositionCollisions(double step, PositionCollisionCallback callback) {
+        ImmutableVector position = getPosition();
+        double maxExtent = getHalfExtents().maxComponent();
+        int radius = (int) (Math.ceil(maxExtent) + 1);
+        double originX = position.getX();
+        double originY = position.getY();
+        double originZ = position.getZ();
+        boolean result = false;
+        for (double x = originX - radius; x <= originX + radius; x += step) {
+            for (double y = originY - radius; y <= originY + radius; y += step) {
+                for (double z = originZ - radius; z <= originZ + radius; z += step) {
+                    ImmutableVector loc = new ImmutableVector(x, y, z);
+                    if (position.distance(loc) > radius) {
+                        continue;
+                    }
+                    if (contains(loc)) {
+                        result = true;
+                        if (callback.onCollision(loc) == CollisionCallbackResult.END) return true;
                     }
                 }
             }

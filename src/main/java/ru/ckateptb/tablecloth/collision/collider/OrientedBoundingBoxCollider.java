@@ -41,14 +41,14 @@ public class OrientedBoundingBoxCollider extends AbstractCollider {
 
     public OrientedBoundingBoxCollider(AxisAlignedBoundingBoxCollider collider) {
         super(collider.getWorld());
-        this.center = collider.getPosition();
+        this.center = collider.getCenter();
         this.axes = new ImmutableVector[]{ImmutableVector.PLUS_I, ImmutableVector.PLUS_J, ImmutableVector.PLUS_K};
         this.halfExtents = collider.getHalfExtents();
     }
 
     public OrientedBoundingBoxCollider(AxisAlignedBoundingBoxCollider aabb, Rotation rotation) {
         super(aabb.getWorld());
-        this.center = rotation.applyTo(aabb.getPosition());
+        this.center = rotation.applyTo(aabb.getCenter());
         double[][] m = rotation.getMatrix();
         this.axes = new ImmutableVector[3];
         for (int i = 0; i < 3; i++) {

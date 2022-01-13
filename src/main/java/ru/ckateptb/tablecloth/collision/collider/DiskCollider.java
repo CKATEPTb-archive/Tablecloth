@@ -11,6 +11,9 @@ public class DiskCollider extends CompositeCollider {
     private final OrientedBoundingBoxCollider orientedBoundingBoxCollider;
     private final SphereCollider sphereCollider;
 
+    public DiskCollider(World world, OrientedBoundingBoxCollider orientedBoundingBoxCollider, SphereCollider sphereCollider) {
+        this(world, ImmutableVector.ZERO, orientedBoundingBoxCollider, sphereCollider);
+    }
     public DiskCollider(World world, Vector position, OrientedBoundingBoxCollider orientedBoundingBoxCollider, SphereCollider sphereCollider) {
         super(world, position, orientedBoundingBoxCollider, sphereCollider);
         this.orientedBoundingBoxCollider = orientedBoundingBoxCollider;
