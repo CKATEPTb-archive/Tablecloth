@@ -66,9 +66,17 @@ public class ImmutableVector extends Vector {
         return new ImmutableVector(x + vector.getX(), y + vector.getY(), z + vector.getZ());
     }
 
+    public @NotNull ImmutableVector add(double x, double y, double z) {
+        return new ImmutableVector(this.x + x, this.y + y, this.z + z);
+    }
+
     @Override
     public @NotNull ImmutableVector subtract(@NotNull Vector vector) {
         return new ImmutableVector(x - vector.getX(), y - vector.getY(), z - vector.getZ());
+    }
+
+    public @NotNull ImmutableVector subtract(double x, double y, double z) {
+        return new ImmutableVector(this.x - x, this.y - y, this.z - z);
     }
 
     public ImmutableVector normalize() {
