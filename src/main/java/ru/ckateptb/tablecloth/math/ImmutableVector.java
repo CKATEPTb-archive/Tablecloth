@@ -3,6 +3,7 @@ package ru.ckateptb.tablecloth.math;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -318,5 +319,22 @@ public class ImmutableVector extends Vector {
 
     public Block toBlock(World world) {
         return toLocation(world).getBlock();
+    }
+
+    public Block getFirstRelativeBlock(World world, BlockFace face, double maxRange) {
+        return this.getFirstRelativeBlock(world, face, maxRange, false);
+    }
+
+    public Block getFirstRelativeBlock(World world, BlockFace face, double maxRange, boolean ignoreLiquids) {
+        return this.getFirstRelativeBlock(world, face, maxRange, ignoreLiquids, true);
+    }
+
+    public Block getFirstRelativeBlock(World world, BlockFace face, double maxRange, boolean ignoreLiquids, boolean ignorePassable) {
+        ImmutableVector direction = new ImmutableVector(face.getDirection());
+        Block block = new RayCollider(world, this, direction, maxRange, 0).getBlock(ignoreLiquids, ignorePassable, b -> true).orElse(null);
+        if (block == null) {
+            block =  this.toLocation(world).add(direction.multiply(maxRange)).getBlock();
+        }
+        return block;
     }
 }
