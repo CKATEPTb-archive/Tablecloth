@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.ckateptb"
-version = "1.0.7-SNAPSHOT"
+version = "1.0.8-SNAPSHOT"
 var githubName = "Tablecloth"
 var githubOwner = "CKATEPTb"
 
@@ -52,6 +52,10 @@ dependencies {
     implementation("com.j256.ormlite:ormlite-jdbc:6.0")
     implementation("xyz.xenondevs:particle:1.7")
     implementation("org.jooq:joor:0.9.13")
+    // high performance, near optimal caching library https://github.com/ben-manes/caffeine
+    implementation("com.github.ben-manes.caffeine", "caffeine", "3.0.5") {
+        exclude(module = "checker-qual")
+    }
     paperDevBundle("1.17.1-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0-SNAPSHOT")
     compileOnly("dev.jorel.CommandAPI:commandapi-core:6.4.0")
@@ -70,6 +74,7 @@ tasks {
             relocate("com.zaxxer.hikari", "ru.ckateptb.tablecloth.storage.hikari")
             relocate("xyz.xenondevs.particle", "ru.ckateptb.tablecloth.particle")
             relocate("org.joor", "ru.ckateptb.tablecloth.reflection")
+            relocate("com.github.benmanes.caffeine", "ru.ckateptb.tablecloth.cache")
         }
     }
     build {
