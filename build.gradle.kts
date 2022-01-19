@@ -74,7 +74,7 @@ tasks {
             relocate("com.zaxxer.hikari", "ru.ckateptb.tablecloth.storage.hikari")
             relocate("xyz.xenondevs.particle", "ru.ckateptb.tablecloth.particle")
             relocate("org.joor", "ru.ckateptb.tablecloth.reflection")
-            relocate("com.github.benmanes.caffeine", "ru.ckateptb.tablecloth.cache")
+            relocate("com.github.benmanes.caffeine.cache", "ru.ckateptb.tablecloth.cache")
         }
     }
     build {
