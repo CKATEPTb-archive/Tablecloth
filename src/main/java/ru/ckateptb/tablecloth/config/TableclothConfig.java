@@ -10,12 +10,12 @@ import ru.ckateptb.tablecloth.temporary.paralyze.ParalyzeType;
 @Component
 public class TableclothConfig extends YamlConfig {
     @ConfigField(name = "debug.collider", comment = "This function is necessary for debugging collisions (do not touch if you do not understand what it is about)")
-    private final boolean debugCollider = false;
+    private boolean debugCollider = false;
 
     @ConfigField(name = "paralyze.name")
-    private final String paralyzeName = "§b§l<==§2§l Paralyzed §b§l==>";
+    private String paralyzeName = "§b§l<==§2§l Paralyzed §b§l==>";
     @ConfigField(name = "paralyze.type", comment = "Allowed types INVENTORY (Not perfect, but very light), ARMORSTAND (recommended ), MOVE_HANDLER (May cause TPS drawdowns with a large number of instances)")
-    private final String paralyzeType = ParalyzeType.ARMORSTAND.name();
+    private String paralyzeType = ParalyzeType.ARMORSTAND.name();
 
     public ParalyzeType getParalyzeType() {
         return ParalyzeType.valueOf(paralyzeType);

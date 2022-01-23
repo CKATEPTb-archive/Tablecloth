@@ -57,12 +57,15 @@ public interface Collider {
     }
 
     default boolean handleEntityCollision(LivingEntity source, boolean livingOnly, boolean selfCollision, boolean armorStandCollision, EntityCollisionCallback callback, Predicate<Entity> filter) {
+        return handleEntityCollision(livingOnly, armorStandCollision, callback, filter.and(entity -> selfCollision || !entity.equals(source)));
+    }
+
+    default boolean handleEntityCollision(boolean livingOnly, boolean armorStandCollision, EntityCollisionCallback callback, Predicate<Entity> filter) {
         World world = getWorld();
         ImmutableVector halfExtents = getHalfExtents();
         ImmutableVector position = getPosition();
         filter = filter.and(entity -> {
             if (livingOnly && !(entity instanceof LivingEntity)) return false;
-            if (!selfCollision && entity.equals(source)) return false;
             if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
             return armorStandCollision || (entity instanceof ArmorStand armorStand && Objects.equals(armorStand.getCustomName(), "paralyze|armor|stand"));
         });
