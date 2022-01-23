@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.ckateptb"
-version = "1.0.8-SNAPSHOT"
+version = "1.0.9-SNAPSHOT"
 var githubName = "Tablecloth"
 var githubOwner = "CKATEPTb"
 
@@ -40,11 +40,17 @@ repositories {
             includeGroup("de.themoep")
         }
     }
+    maven {
+        url = uri("https://repo.codemc.io/repository/maven-snapshots/")
+        content {
+            includeModule("net.wesjd", "anvilgui")
+        }
+    }
 }
 
 dependencies {
     implementation("org.springframework:spring-context:5.3.9")
-//    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
     implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
     implementation("javax.annotation:javax.annotation-api:1.3.2")
     implementation("de.themoep:minedown:1.7.1-SNAPSHOT")
@@ -67,7 +73,7 @@ tasks {
     shadowJar {
         archiveFileName.set("${project.name}-${project.version}.${archiveExtension.getOrElse("jar")}")
         dependencies {
-//            relocate("net.wesjd.anvilgui", "ru.ckateptb.tablecloth.gui.anvil")
+            relocate("net.wesjd.anvilgui", "ru.ckateptb.tablecloth.gui.anvil")
             relocate("xyz.upperlevel.spigot.book", "ru.ckateptb.tablecloth.gui.book")
             relocate("de.themoep.minedown", "ru.ckateptb.tablecloth.minedown")
             relocate("com.j256.ormlite", "ru.ckateptb.tablecloth.storage.ormlite")
@@ -108,33 +114,33 @@ publishing {
                 }
                 artifact(tasks["sourcesJar"])
             }
-//            pom {
-//                name.set(project.name)
-//                url.set("https://github.com/${githubOwner}/${githubName}")
-//                licenses {
-//                    license {
-//                        name.set("The GNU Affero General Public License, Version 3.0")
-//                        url.set("https://www.gnu.org/licenses/agpl-3.0.txt")
-//                    }
-//                }
-//                scm {
-//                    connection.set("scm:git:https://github.com/${githubOwner}/${githubName}.git")
-//                    developerConnection.set("scm:git:ssh://git@github.com/${githubOwner}/${githubName}.git")
-//                    url.set("https://github.com/${githubOwner}/${githubName}")
-//                }
-//                issueManagement {
-//                    system.set("Github")
-//                    url.set("https://github.com/${githubOwner}/${githubName}/issues")
-//                }
-//            }
+            pom {
+                name.set(project.name)
+                url.set("https://github.com/${githubOwner}/${githubName}")
+                licenses {
+                    license {
+                        name.set("The GNU Affero General Public License, Version 3.0")
+                        url.set("https://www.gnu.org/licenses/agpl-3.0.txt")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:https://github.com/${githubOwner}/${githubName}.git")
+                    developerConnection.set("scm:git:ssh://git@github.com/${githubOwner}/${githubName}.git")
+                    url.set("https://github.com/${githubOwner}/${githubName}")
+                }
+                issueManagement {
+                    system.set("Github")
+                    url.set("https://github.com/${githubOwner}/${githubName}/issues")
+                }
+            }
         }
 //        repositories {
 //            maven {
 //                name = githubName
-//                url = uri("https://maven.pkg.github.com/${githubOwner}/${githubName}")
+//                url = uri("https://repo.tablecloth.ml/repository/maven-public/")
 //                credentials {
-//                    username = System.getenv("GITHUB_ACTOR")
-//                    password = System.getenv("GITHUB_TOKEN")
+//                    username = System.getenv("NEXUS_LOGIN")
+//                    password = System.getenv("NEXUS_PASSWORD")
 //                }
 //            }
 //        }

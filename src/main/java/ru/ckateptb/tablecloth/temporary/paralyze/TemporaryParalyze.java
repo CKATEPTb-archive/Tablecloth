@@ -7,10 +7,11 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
 import lombok.SneakyThrows;
-//import net.wesjd.anvilgui.AnvilGUI;
-import org.apache.commons.lang.NotImplementedException;
+import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -22,7 +23,11 @@ import ru.ckateptb.tablecloth.config.TableclothConfig;
 import ru.ckateptb.tablecloth.spring.SpringContext;
 import ru.ckateptb.tablecloth.temporary.*;
 
+import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class TemporaryParalyze extends AbstractTemporary {
     public static final ProtocolManager protocolManager;
@@ -41,6 +46,15 @@ public class TemporaryParalyze extends AbstractTemporary {
         );
     }
 
+    private static final Map<UUID, Cache<UUID, Boolean>> cache = new HashMap<>();
+
+    public static boolean isParalyzed(Entity entity) {
+        UUID uuid = entity.getUniqueId();
+        return cache.containsKey(uuid) && cache.computeIfAbsent(uuid, key ->
+                Caffeine.newBuilder().expireAfterAccess(Duration.ofMillis(1000)).build()
+        ).get(uuid, id -> entity.hasMetadata("tablecloth:paralyze"));
+    }
+
     private final AnnotationConfigApplicationContext context;
     private final TemporaryService temporaryService;
     private final Tablecloth plugin;
@@ -50,7 +64,7 @@ public class TemporaryParalyze extends AbstractTemporary {
     public ArmorStand armorStand;
     private TemporaryBossBar temporaryBossBar;
     private boolean hasAI;
-//    private AnvilGUI anvilGUI;
+    private AnvilGUI anvilGUI;
     private GameMode originalGameMode;
 
     public TemporaryParalyze(LivingEntity livingEntity, long duration) {
@@ -77,18 +91,20 @@ public class TemporaryParalyze extends AbstractTemporary {
             TableclothConfig config = context.getBean(TableclothConfig.class);
             String paralyzeName = config.getParalyzeName();
             this.livingEntity.setMetadata("tablecloth:paralyze", new FixedMetadataValue(this.plugin, this));
+            UUID uuid = player.getUniqueId();
+            cache.put(uuid, Caffeine.newBuilder().expireAfterAccess(Duration.ofMillis(duration)).build());
+            cache.get(uuid).get(uuid, key -> true);
             ParalyzeType paralyzeType = config.getParalyzeType();
             if (paralyzeType == ParalyzeType.INVENTORY) {
-                throw new NotImplementedException("ParalyzeType.INVENTORY don't Implemented yet");
-//                anvilGUI = new AnvilGUI.Builder()
-//                        .preventClose()
-//                        .title(paralyzeName)
-//                        .plugin(Tablecloth.getInstance())
-//                        .text(paralyzeName)
-//                        .onComplete((player1, text) -> AnvilGUI.Response.text(paralyzeName))
-//                        .itemLeft(new ItemStack(Material.BARRIER))
-//                        .itemRight(new ItemStack(Material.BARRIER))
-//                        .open(player);
+                anvilGUI = new AnvilGUI.Builder()
+                        .preventClose()
+                        .title(paralyzeName)
+                        .plugin(Tablecloth.getInstance())
+                        .text(paralyzeName)
+                        .onComplete((player1, text) -> AnvilGUI.Response.text(paralyzeName))
+                        .itemLeft(new ItemStack(Material.BARRIER))
+                        .itemRight(new ItemStack(Material.BARRIER))
+                        .open(player);
             } else if (paralyzeType == ParalyzeType.ARMORSTAND) {
                 this.originalGameMode = player.getGameMode();
                 this.armorStand = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
@@ -96,7 +112,8 @@ public class TemporaryParalyze extends AbstractTemporary {
                 this.armorStand.setCanPickupItems(false);
                 this.armorStand.setMarker(false);
                 this.armorStand.setVisible(false);
-                player.addPassenger(this.armorStand);
+                this.armorStand.setCustomName("paralyze|armor|stand");
+                this.armorStand.setCustomNameVisible(false);
                 player.setSneaking(false);
                 spectateArmorStand();
             }
@@ -143,8 +160,10 @@ public class TemporaryParalyze extends AbstractTemporary {
     @Override
     public void revert() {
         if (livingEntity.hasMetadata("tablecloth:paralyze")) livingEntity.removeMetadata("tablecloth:paralyze", plugin);
-//        if (anvilGUI != null) anvilGUI.closeInventory();
+        cache.remove(livingEntity.getUniqueId());
+        if (anvilGUI != null) anvilGUI.closeInventory();
         if (armorStand != null) {
+            livingEntity.teleport(armorStand);
             this.armorStand.remove();
             if (livingEntity instanceof Player player) {
                 changeGameModePacket(player, (byte) originalGameMode.getValue());

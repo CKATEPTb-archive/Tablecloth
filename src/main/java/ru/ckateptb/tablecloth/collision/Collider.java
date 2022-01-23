@@ -16,6 +16,7 @@ import ru.ckateptb.tablecloth.collision.callback.PositionCollisionCallback;
 import ru.ckateptb.tablecloth.collision.collider.AxisAlignedBoundingBoxCollider;
 import ru.ckateptb.tablecloth.math.ImmutableVector;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public interface Collider {
@@ -63,7 +64,7 @@ public interface Collider {
             if (livingOnly && !(entity instanceof LivingEntity)) return false;
             if (!selfCollision && entity.equals(source)) return false;
             if (entity instanceof Player player && player.getGameMode() == GameMode.SPECTATOR) return false;
-            return armorStandCollision || !(entity instanceof ArmorStand);
+            return armorStandCollision || (entity instanceof ArmorStand armorStand && Objects.equals(armorStand.getCustomName(), "paralyze|armor|stand"));
         });
         for (Entity entity : world.getNearbyEntities(position.toLocation(world), halfExtents.getX(), halfExtents.getY(), halfExtents.getZ(), filter)) {
             if (intersects(new AxisAlignedBoundingBoxCollider(entity).at(entity.getLocation().toVector()))) {
