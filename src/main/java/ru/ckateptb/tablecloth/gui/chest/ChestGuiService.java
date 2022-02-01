@@ -5,13 +5,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
-import org.springframework.stereotype.Service;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Service
+@Component
 public class ChestGuiService implements Listener {
     private final Map<Inventory, ChestGui> instances = new HashMap<>();
 

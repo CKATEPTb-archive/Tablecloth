@@ -3,14 +3,15 @@ package ru.ckateptb.tablecloth.collision.debug;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.RandomUtils;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 import ru.ckateptb.tablecloth.Tablecloth;
 import ru.ckateptb.tablecloth.async.AsyncService;
 import ru.ckateptb.tablecloth.collision.Collider;
 import ru.ckateptb.tablecloth.collision.callback.CollisionCallbackResult;
 import ru.ckateptb.tablecloth.collision.collider.CompositeCollider;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
+import ru.ckateptb.tablecloth.ioc.annotation.Autowired;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
+import ru.ckateptb.tablecloth.ioc.annotation.Scheduled;
 import ru.ckateptb.tablecloth.math.ImmutableVector;
 import ru.ckateptb.tablecloth.particle.Particle;
 
@@ -18,22 +19,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-@Service
+@Component
 public class DebugColliderService {
     private final List<Collider> colliders = new ArrayList<>();
     private boolean collidersLocked = false;
     private final AsyncService asyncService;
     private final TableclothConfig config;
 
+    @Autowired
     public DebugColliderService(AsyncService asyncService, TableclothConfig config) {
         this.asyncService = asyncService;
         this.config = config;
         Bukkit.getScheduler().runTaskTimer(Tablecloth.getInstance(), this::debug, 0, 5);
     }
 
-    @Scheduled(fixedRate = 5)
+    @Scheduled(period = 5)
     public void debug() {
-        if(!config.isDebugCollider()) return;
+        if (!config.isDebugCollider()) return;
         double step = 0.1;
         if (this.colliders.isEmpty()) return;
         List<Collider> colliders = new ArrayList<>(this.colliders);
@@ -60,7 +62,7 @@ public class DebugColliderService {
     }
 
     public void addCollider(Collider collider) {
-        if(!config.isDebugCollider()) return;
+        if (!config.isDebugCollider()) return;
         asyncService.supplyAsync(() -> {
             while (true) {
                 if (!collidersLocked) {
@@ -73,7 +75,7 @@ public class DebugColliderService {
     }
 
     public void removeCollider(Collider collider) {
-        if(!config.isDebugCollider()) return;
+        if (!config.isDebugCollider()) return;
         asyncService.supplyAsync(() -> {
             while (true) {
                 if (!collidersLocked) {
@@ -86,7 +88,7 @@ public class DebugColliderService {
     }
 
     public void clearColliders() {
-        if(!config.isDebugCollider()) return;
+        if (!config.isDebugCollider()) return;
         asyncService.supplyAsync(() -> {
             while (true) {
                 if (!collidersLocked) {

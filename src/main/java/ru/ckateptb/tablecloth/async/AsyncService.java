@@ -1,9 +1,8 @@
 package ru.ckateptb.tablecloth.async;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
+import ru.ckateptb.tablecloth.ioc.annotation.Scheduled;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,8 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 @Slf4j
-@Service
-@EnableScheduling
+@Component
 public class AsyncService {
     private final Map<CompletableFuture<Object>, Consumer<Object>> completableFutures = new HashMap<>();
 
@@ -34,7 +32,7 @@ public class AsyncService {
         return completableFuture;
     }
 
-    @Scheduled(fixedRate = 1)
+    @Scheduled(period = 1)
     public void onTick() {
         List<CompletableFuture<Object>> toRemove = new ArrayList<>();
         completableFutures.forEach((completableFuture, handler) -> {

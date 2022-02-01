@@ -4,9 +4,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.ckateptb.tablecloth.Tablecloth;
-import ru.ckateptb.tablecloth.spring.SpringContext;
+import ru.ckateptb.tablecloth.ioc.IoC;
 import ru.ckateptb.tablecloth.temporary.AbstractTemporary;
 import ru.ckateptb.tablecloth.temporary.Temporary;
 import ru.ckateptb.tablecloth.temporary.TemporaryService;
@@ -15,7 +14,6 @@ import ru.ckateptb.tablecloth.temporary.TemporaryUpdateState;
 import java.util.List;
 
 public class TemporaryArmor extends AbstractTemporary {
-    private final AnnotationConfigApplicationContext context;
     private final TemporaryService temporaryService;
     private final Tablecloth plugin;
 
@@ -32,8 +30,7 @@ public class TemporaryArmor extends AbstractTemporary {
         this.chestplate = chestplate;
         this.leggings = leggings;
         this.boots = boots;
-        this.context = SpringContext.getInstance();
-        this.temporaryService = context.getBean(TemporaryService.class);
+        this.temporaryService = IoC.get(TemporaryService.class);
         this.plugin = Tablecloth.getInstance();
         if (this.livingEntity.hasMetadata("tablecloth:armor")) {
             List.copyOf(this.livingEntity.getMetadata("tablecloth:armor")).forEach(metadataValue -> {

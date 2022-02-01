@@ -11,16 +11,15 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.Getter;
 import lombok.SneakyThrows;
-import net.wesjd.anvilgui.AnvilGUI;
+//import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.ckateptb.tablecloth.Tablecloth;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
-import ru.ckateptb.tablecloth.spring.SpringContext;
+import ru.ckateptb.tablecloth.ioc.IoC;
 import ru.ckateptb.tablecloth.temporary.*;
 
 import java.time.Duration;
@@ -55,7 +54,6 @@ public class TemporaryParalyze extends AbstractTemporary {
         ).get(uuid, id -> entity.hasMetadata("tablecloth:paralyze"));
     }
 
-    private final AnnotationConfigApplicationContext context;
     private final TemporaryService temporaryService;
     private final Tablecloth plugin;
     @Getter
@@ -64,14 +62,13 @@ public class TemporaryParalyze extends AbstractTemporary {
     public ArmorStand armorStand;
     private TemporaryBossBar temporaryBossBar;
     private boolean hasAI;
-    private AnvilGUI anvilGUI;
+//    private AnvilGUI anvilGUI;
     private GameMode originalGameMode;
 
     public TemporaryParalyze(LivingEntity livingEntity, long duration) {
         this.livingEntity = livingEntity;
         this.duration = duration;
-        this.context = SpringContext.getInstance();
-        this.temporaryService = context.getBean(TemporaryService.class);
+        this.temporaryService = IoC.get(TemporaryService.class);
         this.plugin = Tablecloth.getInstance();
         if (this.livingEntity.hasMetadata("tablecloth:paralyze")) {
             List.copyOf(this.livingEntity.getMetadata("tablecloth:paralyze")).forEach(metadataValue -> {
@@ -88,7 +85,7 @@ public class TemporaryParalyze extends AbstractTemporary {
     @SneakyThrows
     public void init() {
         if (livingEntity instanceof Player player) {
-            TableclothConfig config = context.getBean(TableclothConfig.class);
+            TableclothConfig config = IoC.get(TableclothConfig.class);
             String paralyzeName = config.getParalyzeName();
             this.livingEntity.setMetadata("tablecloth:paralyze", new FixedMetadataValue(this.plugin, this));
             UUID uuid = player.getUniqueId();
@@ -96,15 +93,15 @@ public class TemporaryParalyze extends AbstractTemporary {
             cache.get(uuid).get(uuid, key -> true);
             ParalyzeType paralyzeType = config.getParalyzeType();
             if (paralyzeType == ParalyzeType.INVENTORY) {
-                anvilGUI = new AnvilGUI.Builder()
-                        .preventClose()
-                        .title(paralyzeName)
-                        .plugin(Tablecloth.getInstance())
-                        .text(paralyzeName)
-                        .onComplete((player1, text) -> AnvilGUI.Response.text(paralyzeName))
-                        .itemLeft(new ItemStack(Material.BARRIER))
-                        .itemRight(new ItemStack(Material.BARRIER))
-                        .open(player);
+//                anvilGUI = new AnvilGUI.Builder()
+//                        .preventClose()
+//                        .title(paralyzeName)
+//                        .plugin(Tablecloth.getInstance())
+//                        .text(paralyzeName)
+//                        .onComplete((player1, text) -> AnvilGUI.Response.text(paralyzeName))
+//                        .itemLeft(new ItemStack(Material.BARRIER))
+//                        .itemRight(new ItemStack(Material.BARRIER))
+//                        .open(player);
             } else if (paralyzeType == ParalyzeType.ARMORSTAND) {
                 this.originalGameMode = player.getGameMode();
                 this.armorStand = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
@@ -161,7 +158,7 @@ public class TemporaryParalyze extends AbstractTemporary {
     public void revert() {
         if (livingEntity.hasMetadata("tablecloth:paralyze")) livingEntity.removeMetadata("tablecloth:paralyze", plugin);
         cache.remove(livingEntity.getUniqueId());
-        if (anvilGUI != null) anvilGUI.closeInventory();
+//        if (anvilGUI != null) anvilGUI.closeInventory();
         if (armorStand != null) {
             livingEntity.teleport(armorStand);
             this.armorStand.remove();

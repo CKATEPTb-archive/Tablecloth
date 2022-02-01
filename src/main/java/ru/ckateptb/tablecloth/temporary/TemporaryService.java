@@ -1,20 +1,20 @@
 package ru.ckateptb.tablecloth.temporary;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.PluginDisableEvent;
+import ru.ckateptb.tablecloth.Tablecloth;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
+import ru.ckateptb.tablecloth.ioc.annotation.Scheduled;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 @Slf4j
-@Service
-@EnableScheduling
-public class TemporaryService {
+@Component
+public class TemporaryService implements Listener {
     private final List<Temporary> temporaryList = new ArrayList<>();
 
     /**
@@ -30,7 +30,7 @@ public class TemporaryService {
     /**
      * Каждый тик вызывает {@link Temporary#update()} и возвращает объект в исходное состояние в случае необходимости
      */
-    @Scheduled(fixedRate = 1)
+    @Scheduled(period = 1)
     public void updateAll() {
         List<Temporary> revertList = new ArrayList<>();
         temporaryList.forEach(temporary -> {
@@ -75,13 +75,11 @@ public class TemporaryService {
         return List.copyOf(temporaryList);
     }
 
-    /**
-     * ContextCloseEvent Срабатывает при закрытие контейнера (во время выключения сервера/плагина)
-     * Возвращает все временные объекты в исходное состояние
-     */
-    @EventListener
-    public void handleContextRefreshEvent(ContextClosedEvent ignored) {
-        log.info("Reverting all Temporaries");
-        this.revertAll();
+    @EventHandler
+    public void on(PluginDisableEvent event) {
+        if(event.getPlugin().equals(Tablecloth.getInstance())) {
+            log.info("Reverting all Temporaries");
+            this.revertAll();
+        }
     }
 }

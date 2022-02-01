@@ -2,8 +2,8 @@ package ru.ckateptb.tablecloth.config;
 
 import lombok.Getter;
 import org.bukkit.plugin.Plugin;
-import org.springframework.stereotype.Component;
 import ru.ckateptb.tablecloth.Tablecloth;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
 import ru.ckateptb.tablecloth.temporary.paralyze.ParalyzeType;
 
 @Getter

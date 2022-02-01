@@ -6,15 +6,16 @@ import dev.jorel.commandapi.arguments.LongArgument;
 import dev.jorel.commandapi.arguments.PlayerArgument;
 import dev.jorel.commandapi.arguments.TextArgument;
 import org.bukkit.entity.Player;
-import org.springframework.stereotype.Component;
 import ru.ckateptb.tablecloth.collision.collider.AxisAlignedBoundingBoxCollider;
 import ru.ckateptb.tablecloth.collision.collider.DiskCollider;
 import ru.ckateptb.tablecloth.collision.collider.OrientedBoundingBoxCollider;
 import ru.ckateptb.tablecloth.collision.collider.SphereCollider;
 import ru.ckateptb.tablecloth.collision.debug.DebugColliderService;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
+import ru.ckateptb.tablecloth.ioc.IoC;
+import ru.ckateptb.tablecloth.ioc.annotation.Autowired;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
 import ru.ckateptb.tablecloth.math.ImmutableVector;
-import ru.ckateptb.tablecloth.spring.SpringContext;
 import ru.ckateptb.tablecloth.temporary.TemporaryBossBar;
 import ru.ckateptb.tablecloth.temporary.paralyze.TemporaryParalyze;
 
@@ -22,13 +23,14 @@ import java.util.Arrays;
 
 @Component
 public class TableclothCommand {
+    @Autowired
     public TableclothCommand(DebugColliderService debugColliderService) {
         new CommandAPICommand("tablecloth")
                 .withPermission("tablecloth.admin")
                 .withSubcommand(
                         new CommandAPICommand("reload")
                                 .executes((sender, args) -> {
-                                    SpringContext.getInstance().getBean(TableclothConfig.class).load();
+                                    IoC.get(TableclothConfig.class).load();
                                 })
                 )
                 .withSubcommand(

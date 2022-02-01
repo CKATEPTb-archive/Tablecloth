@@ -1,7 +1,7 @@
 package ru.ckateptb.tablecloth.temporary;
 
 import lombok.Getter;
-import ru.ckateptb.tablecloth.spring.SpringContext;
+import ru.ckateptb.tablecloth.ioc.IoC;
 
 public abstract class AbstractTemporary implements Temporary {
     private long revertTime = -1;
@@ -13,7 +13,7 @@ public abstract class AbstractTemporary implements Temporary {
      * Зарегистрировать объект в стандартном сервисе для временных объектов {@link TemporaryService}
      */
     public final void register() {
-        this.temporaryService = SpringContext.getInstance().getBean(TemporaryService.class);
+        this.temporaryService = IoC.get(TemporaryService.class);
         this.temporaryService.register(this);
     }
 

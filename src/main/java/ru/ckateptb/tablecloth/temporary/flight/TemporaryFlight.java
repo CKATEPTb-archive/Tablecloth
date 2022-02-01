@@ -5,9 +5,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import ru.ckateptb.tablecloth.Tablecloth;
-import ru.ckateptb.tablecloth.spring.SpringContext;
+import ru.ckateptb.tablecloth.ioc.IoC;
 import ru.ckateptb.tablecloth.temporary.AbstractTemporary;
 import ru.ckateptb.tablecloth.temporary.Temporary;
 import ru.ckateptb.tablecloth.temporary.TemporaryService;
@@ -18,7 +17,6 @@ import java.util.List;
 
 @Getter
 public class TemporaryFlight extends AbstractTemporary {
-    private final AnnotationConfigApplicationContext context;
     private final TemporaryService temporaryService;
     private final Tablecloth plugin;
 
@@ -31,8 +29,7 @@ public class TemporaryFlight extends AbstractTemporary {
     private boolean originalIsFlying;
 
     public TemporaryFlight(LivingEntity livingEntity, long duration, boolean preventFallDamage, boolean revertIfOnGround, boolean enableFly) {
-        this.context = SpringContext.getInstance();
-        this.temporaryService = context.getBean(TemporaryService.class);
+        this.temporaryService = IoC.get(TemporaryService.class);
         this.plugin = Tablecloth.getInstance();
 
         this.livingEntity = livingEntity;

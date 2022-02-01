@@ -7,16 +7,11 @@ plugins {
 }
 
 group = "ru.ckateptb"
-version = "1.0.9-SNAPSHOT"
-var githubName = "Tablecloth"
-var githubOwner = "CKATEPTb"
+version = "1.1.0-SNAPSHOT"
 
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
-    }
-    if (!isSnapshot()) {
-        withJavadocJar()
     }
     withSourcesJar()
 }
@@ -49,15 +44,13 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework:spring-context:5.3.9")
-    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
-    implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
-    implementation("javax.annotation:javax.annotation-api:1.3.2")
+//    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+//    implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
     implementation("de.themoep:minedown:1.7.1-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:3.4.2")
     implementation("com.j256.ormlite:ormlite-jdbc:6.0")
     implementation("xyz.xenondevs:particle:1.7")
-    implementation("org.jooq:joor:0.9.13")
+//    implementation("org.jooq:joor:0.9.13")
     // high performance, near optimal caching library https://github.com/ben-manes/caffeine
     implementation("com.github.ben-manes.caffeine", "caffeine", "3.0.5") {
         exclude(module = "checker-qual")
@@ -86,9 +79,6 @@ tasks {
     build {
         dependsOn(reobfJar, shadowJar)
     }
-    withType<Sign>().configureEach {
-        onlyIf { !isSnapshot() }
-    }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
@@ -109,47 +99,8 @@ publishing {
                 artifact(tasks.shadowJar) {
                     classifier = ""
                 }
-                if (!isSnapshot()) {
-                    artifact(tasks.javadoc)
-                }
                 artifact(tasks["sourcesJar"])
             }
-            pom {
-                name.set(project.name)
-                url.set("https://github.com/${githubOwner}/${githubName}")
-                licenses {
-                    license {
-                        name.set("The GNU Affero General Public License, Version 3.0")
-                        url.set("https://www.gnu.org/licenses/agpl-3.0.txt")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:https://github.com/${githubOwner}/${githubName}.git")
-                    developerConnection.set("scm:git:ssh://git@github.com/${githubOwner}/${githubName}.git")
-                    url.set("https://github.com/${githubOwner}/${githubName}")
-                }
-                issueManagement {
-                    system.set("Github")
-                    url.set("https://github.com/${githubOwner}/${githubName}/issues")
-                }
-            }
         }
-//        repositories {
-//            maven {
-//                name = githubName
-//                url = uri("https://repo.tablecloth.ml/repository/maven-public/")
-//                credentials {
-//                    username = System.getenv("NEXUS_LOGIN")
-//                    password = System.getenv("NEXUS_PASSWORD")
-//                }
-//            }
-//        }
     }
 }
-
-
-signing {
-    sign(publishing.publications["maven"])
-}
-
-fun isSnapshot() = project.version.toString().endsWith("-SNAPSHOT")

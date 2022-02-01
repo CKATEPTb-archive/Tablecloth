@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import ru.ckateptb.tablecloth.gui.ItemButton;
-import ru.ckateptb.tablecloth.spring.SpringContext;
+import ru.ckateptb.tablecloth.ioc.IoC;
 
 import java.util.Optional;
 
@@ -61,7 +61,7 @@ public class ChestGui implements InventoryHolder {
 
     public void open() {
         player.openInventory(this.inventory);
-        SpringContext.getInstance().getBean(ChestGuiService.class).register(this);
+        IoC.get(ChestGuiService.class).register(this);
     }
 
     public Optional<ItemButton> getButton(int slot) {

@@ -6,7 +6,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.springframework.stereotype.Component;
+import ru.ckateptb.tablecloth.ioc.annotation.Autowired;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
 import ru.ckateptb.tablecloth.temporary.Temporary;
 import ru.ckateptb.tablecloth.temporary.TemporaryService;
 
@@ -14,6 +15,7 @@ import ru.ckateptb.tablecloth.temporary.TemporaryService;
 public class FlightHandler implements Listener {
     private final TemporaryService temporaryService;
 
+    @Autowired
     public FlightHandler(TemporaryService temporaryService) {
         this.temporaryService = temporaryService;
     }

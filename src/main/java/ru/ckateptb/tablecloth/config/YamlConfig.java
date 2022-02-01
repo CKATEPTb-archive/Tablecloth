@@ -7,8 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
+import ru.ckateptb.tablecloth.ioc.annotation.PostConstruct;
 
-import javax.annotation.PostConstruct;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

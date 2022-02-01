@@ -17,9 +17,7 @@ import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
 
 /**
  * @Author Borlea
@@ -29,12 +27,6 @@ import java.util.List;
  */
 @Component
 public class ArmorHandler implements Listener {
-    private final List<String> blockedMaterials;
-
-    public ArmorHandler(List<String> blockedMaterials) {
-        this.blockedMaterials = blockedMaterials;
-    }
-
     @EventHandler
     public final void onInventoryClick(final InventoryClickEvent e) {
         boolean shift = false, numberkey = false;
@@ -115,9 +107,6 @@ public class ArmorHandler implements Listener {
             if (e.getClickedBlock() != null && e.getAction() == Action.RIGHT_CLICK_BLOCK) {// Having both of these checks is useless, might as well do it though.
                 // Some blocks have actions when you right click them which stops the client from equipping the armor in hand.
                 Material mat = e.getClickedBlock().getType();
-                for (String s : blockedMaterials) {
-                    if (mat.name().equalsIgnoreCase(s)) return;
-                }
             }
             ArmorType newArmorType = ArmorType.matchType(e.getItem());
             if (newArmorType != null) {
@@ -193,10 +182,10 @@ public class ArmorHandler implements Listener {
                 ItemStack i = e.getBrokenItem().clone();
                 i.setAmount(1);
                 ItemMeta itemMeta = i.getItemMeta();
-                if(itemMeta == null) {
+                if (itemMeta == null) {
                     itemMeta = Bukkit.getItemFactory().getItemMeta(i.getType());
                 }
-                if(itemMeta instanceof Damageable damageable) {
+                if (itemMeta instanceof Damageable damageable) {
                     damageable.setDamage(damageable.getDamage() - 1);
                 }
                 if (type.equals(ArmorType.HELMET)) {

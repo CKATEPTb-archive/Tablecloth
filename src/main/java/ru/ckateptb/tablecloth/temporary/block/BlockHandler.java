@@ -5,7 +5,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.springframework.stereotype.Component;
+import ru.ckateptb.tablecloth.ioc.annotation.Component;
 
 @Component
 public class BlockHandler implements Listener {
