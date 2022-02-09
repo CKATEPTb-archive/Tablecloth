@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.ckateptb"
-version = "1.1.0-SNAPSHOT"
+version = "1.1.1-SNAPSHOT"
 
 java {
     toolchain {
@@ -44,8 +44,8 @@ repositories {
 }
 
 dependencies {
-//    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
-//    implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
+    implementation("net.wesjd:anvilgui:1.5.3-SNAPSHOT")
+    implementation("xyz.upperlevel.spigot.book:spigot-book-api:1.6")
     implementation("de.themoep:minedown:1.7.1-SNAPSHOT")
     implementation("com.zaxxer:HikariCP:3.4.2")
     implementation("com.j256.ormlite:ormlite-jdbc:6.0")

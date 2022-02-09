@@ -9,7 +9,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.*;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
-import ru.ckateptb.tablecloth.ioc.annotation.Autowired;
 import ru.ckateptb.tablecloth.ioc.annotation.Component;
 import ru.ckateptb.tablecloth.temporary.Temporary;
 import ru.ckateptb.tablecloth.temporary.TemporaryService;
@@ -19,7 +18,6 @@ public class ParalyzeHandler implements Listener {
     private final TableclothConfig config;
     private final TemporaryService temporaryService;
 
-    @Autowired
     public ParalyzeHandler(TableclothConfig config, TemporaryService temporaryService) {
         this.config = config;
         this.temporaryService = temporaryService;

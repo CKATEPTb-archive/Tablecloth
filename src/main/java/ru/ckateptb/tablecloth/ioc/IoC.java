@@ -57,9 +57,9 @@ public class IoC<P extends Plugin> {
         return null;
     }
 
-    private final BeanContainer beanContainer = new BeanContainer();
-    private final ImplementationContainer implementationContainer = new ImplementationContainer();
-    private final CircularDetector circularDetector = new CircularDetector();
+    private static final BeanContainer beanContainer = new BeanContainer();
+    private static final ImplementationContainer implementationContainer = new ImplementationContainer();
+    private static final CircularDetector circularDetector = new CircularDetector();
 
     private final P plugin;
     private final ClassLoader classLoader;
@@ -266,20 +266,21 @@ public class IoC<P extends Plugin> {
     private Object newInstance(Class<?> clazz) throws IllegalAccessException,
             InstantiationException, InvocationTargetException, NoSuchMethodException,
             IoCBeanNotFound, IoCCircularDepException {
-        Constructor<?> annotatedConstructor = FinderUtil.findAnnotatedConstructor(clazz, Autowired.class);
-        Object instance;
-        if (annotatedConstructor == null) {
+        Constructor<?> defaultConstructor = FinderUtil.findAnnotatedConstructor(clazz, Autowired.class);
+        if (defaultConstructor == null) {
             try {
-                Constructor<?> defaultConstructor = clazz.getConstructor();
-                defaultConstructor.setAccessible(true);
-                instance = defaultConstructor.newInstance();
-            } catch (NoSuchMethodException e) {
-                throw new IoCException("There is no default constructor in class " + clazz.getName());
+                defaultConstructor = clazz.getConstructors()[0];
+            } catch (Throwable throwable) {
+                try {
+                    defaultConstructor = clazz.getConstructor();
+                } catch (NoSuchMethodException e) {
+                    throw new IoCException("There is no default constructor in class " + clazz.getName());
+                }
             }
-        } else {
-            Object[] parameters = getParameters(annotatedConstructor.getParameterCount(), annotatedConstructor.getParameters(), annotatedConstructor.getParameterTypes());
-            instance = annotatedConstructor.newInstance(parameters);
+            defaultConstructor.setAccessible(true);
         }
+        Object[] parameters = getParameters(defaultConstructor.getParameterCount(), defaultConstructor.getParameters(), defaultConstructor.getParameterTypes());
+        Object instance = defaultConstructor.newInstance(parameters);
         FinderUtil.findMethods(clazz, PostConstruct.class).forEach(post -> {
             if (post.getParameterCount() > 0) {
                 new IoCException("Method " + post + " must not take parameters").printStackTrace();

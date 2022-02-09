@@ -9,7 +9,6 @@ import ru.ckateptb.tablecloth.collision.Collider;
 import ru.ckateptb.tablecloth.collision.callback.CollisionCallbackResult;
 import ru.ckateptb.tablecloth.collision.collider.CompositeCollider;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
-import ru.ckateptb.tablecloth.ioc.annotation.Autowired;
 import ru.ckateptb.tablecloth.ioc.annotation.Component;
 import ru.ckateptb.tablecloth.ioc.annotation.Scheduled;
 import ru.ckateptb.tablecloth.math.ImmutableVector;
@@ -26,7 +25,6 @@ public class DebugColliderService {
     private final AsyncService asyncService;
     private final TableclothConfig config;
 
-    @Autowired
     public DebugColliderService(AsyncService asyncService, TableclothConfig config) {
         this.asyncService = asyncService;
         this.config = config;

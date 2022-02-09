@@ -13,7 +13,6 @@ import ru.ckateptb.tablecloth.collision.collider.SphereCollider;
 import ru.ckateptb.tablecloth.collision.debug.DebugColliderService;
 import ru.ckateptb.tablecloth.config.TableclothConfig;
 import ru.ckateptb.tablecloth.ioc.IoC;
-import ru.ckateptb.tablecloth.ioc.annotation.Autowired;
 import ru.ckateptb.tablecloth.ioc.annotation.Component;
 import ru.ckateptb.tablecloth.math.ImmutableVector;
 import ru.ckateptb.tablecloth.temporary.TemporaryBossBar;
@@ -23,7 +22,6 @@ import java.util.Arrays;
 
 @Component
 public class TableclothCommand {
-    @Autowired
     public TableclothCommand(DebugColliderService debugColliderService) {
         new CommandAPICommand("tablecloth")
                 .withPermission("tablecloth.admin")
